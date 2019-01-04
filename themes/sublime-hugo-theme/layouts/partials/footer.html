@@ -1,0 +1,5 @@
+<footer>
+	{{ with .Site.Params.copyright }}
+        <small>{{ . | markdownify }} {{ now.Format "2006"}}</small>
+	{{ end }}
+</footer>

@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "name": "octozara",
+  "builds": [
+    { "src": "./package.json", "use": "@now/static-build" }
+  ],
+  "alias": ["next.zaratan.fr"]
+}

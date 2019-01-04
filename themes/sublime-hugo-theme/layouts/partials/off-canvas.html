@@ -1,0 +1,61 @@
+<div class="off-canvas">
+    <figure class="avatar">
+      {{ with "denis.pasin@gmail.com" }}
+        <img id="avatar" src="https://www.gravatar.com/avatar/{{ . | md5 }}?s=160&d=identicon" title="Zaratan"/>
+      {{ end }}
+    </figure>
+    <div class="bio">
+        {{ with .Site.Params.offcanvas.title }}
+        <h1>{{ . }}</h1>
+        {{ end }}
+        {{ with .Site.Params.offcanvas.bio }}
+        <p>{{ . | markdownify }}</p>
+        {{ end }}
+        {{ with .Site.Params.offcanvas.bio2 }}
+        <p class="bio2">{{ . | markdownify }}</p>
+        {{ end }}
+    </div>
+    <nav>
+
+        {{ if .Site.Params.offcanvas.search_enabled }}
+
+                <form name="google-search" method="get" action="https://www.google.com/search" target="_blank">
+            {{ with .Site.Params.offcanvas.search }}
+            <h6><label for="q">{{ . }}</label></h6>
+            {{ end }}
+
+            <div>
+                    <input type="hidden" name="sitesearch" value="{{ .Site.BaseURL }}" />
+                    <label style="display:none" for="q">Search</label>
+                    <input class="search-input" id="q" name="q" type="text" required />
+                    <input class="search-submit" type="submit" name="sa" value="Search" />
+                </form>
+            </div>
+
+        {{end}}        
+
+        {{ with .Site.Params.offcanvas.followme }}
+        <h6>{{ . }}</h6>
+        {{ end }}
+
+        <ul>
+        {{ range .Site.Params.offcanvas.socialnetworks }}
+            <li><a class="email" target="_blank" href="{{ .url }}">{{ .name }}</a></li>
+            <li><a class="twitter" href="https://twitter.com/@zaratan" title="Twitter">Twitter</a></li>
+            <li>
+              <a class="github" href="https://github.com/denispasin" title="GitHub">
+                Github
+              </a>
+            </li>
+        {{ end }}
+        </ul>     
+
+        {{ with .Site.Params.offcanvas.subscribe }}
+        <h6>{{ . }}</h6>
+        {{ end }}
+
+        <ul>
+            <li><a class="rss" target="_blank" href="/index.xml">RSS feed</a></li>
+        </ul>   
+    </nav>
+</div>
