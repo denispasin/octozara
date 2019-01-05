@@ -67,40 +67,40 @@ window.onload = function() {
     });
 
     //smooth-scrollbar
-    var setScrollbar = function(){
-        scrollbar = Scrollbar.init(document.getElementById('full-wrapper'), {
-            speed: 1.0,
-            damping: 0.1,
-            overscrollDamping: 0.2,
-            thumbMinSize: 20,
-            renderByPixels: true,
-            alwaysShowTracks: false,
-            continuousScrolling: 'auto',
-            overscrollEffect: 'bounce',
-            overscrollEffectColor: '#000'
-        });
-    };
+    // var setScrollbar = function(){
+    //     scrollbar = Scrollbar.init(document.getElementById('full-wrapper'), {
+    //         speed: 1.0,
+    //         damping: 0.1,
+    //         overscrollDamping: 0.2,
+    //         thumbMinSize: 20,
+    //         renderByPixels: true,
+    //         alwaysShowTracks: false,
+    //         continuousScrolling: 'auto',
+    //         overscrollEffect: 'bounce',
+    //         overscrollEffectColor: '#000'
+    //     });
+    // };
 
-    if($(window).width() >= 1025){
-        if(document.getElementById('full-wrapper')){
-            setScrollbar();     
-        }
-    }
-    else{
-        $('.full-wrapper').css({'overflow-y':'scroll', '-webkit-overflow-scrolling':'touch', 'overflow-x':'hidden'});
-    }
+    // if($(window).width() >= 1025){
+    //     if(document.getElementById('full-wrapper')){
+    //         setScrollbar();     
+    //     }
+    // }
+    // else{
+    //     $('.full-wrapper').css({'overflow-y':'scroll', '-webkit-overflow-scrolling':'touch', 'overflow-x':'hidden'});
+    // }
 
-    window.onresize = function(event) {
-        if($(window).width() < 1025 && Scrollbar.has(document.getElementById('full-wrapper'))){
-            scrollbar.destroy();
-            $('.full-wrapper').css({'overflow-y':'scroll', '-webkit-overflow-scrolling':'touch', 'overflow-x':'hidden'});
-        }
-        if($(window).width() >= 1025 && !(Scrollbar.has(document.getElementById('full-wrapper')))){
-            if(document.getElementById('full-wrapper')){
-                setScrollbar();     
-            }
-        }
-    };
+    // window.onresize = function(event) {
+    //     if($(window).width() < 1025 && Scrollbar.has(document.getElementById('full-wrapper'))){
+    //         scrollbar.destroy();
+    //         $('.full-wrapper').css({'overflow-y':'scroll', '-webkit-overflow-scrolling':'touch', 'overflow-x':'hidden'});
+    //     }
+    //     if($(window).width() >= 1025 && !(Scrollbar.has(document.getElementById('full-wrapper')))){
+    //         if(document.getElementById('full-wrapper')){
+    //             setScrollbar();     
+    //         }
+    //     }
+    // };
 
     // Open Twitter/share in a Pop-Up
     var $popup = document.getElementsByClassName('popup')[0];
