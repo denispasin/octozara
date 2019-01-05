@@ -1352,11 +1352,11 @@ footer small {
 }
 
 #prev {
-    right: 30px;
+    left: 30px;
 }
 
 #next {
-    left: 30px;
+    right: 30px;
 }
 
 @media screen and (max-width: 642px) {

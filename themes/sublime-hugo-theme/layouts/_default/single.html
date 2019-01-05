@@ -37,14 +37,14 @@
     </div>
 
     <div class="next-prev-arrows">
-        {{ if .NextInSection }}
-            <a rel="next" href="{{ .NextInSection.Permalink }}" id="next">
-                &larr; <span class="nav-title nav-title-next">{{ .NextInSection.Title }}</span> 
-            </a>
-        {{ end }}
         {{ if .PrevInSection }}
             <a rel="prev" href="{{ .PrevInSection.Permalink }}" id="prev">
-                 <span class="nav-title nav-title-prev">{{ .PrevInSection.Title }}</span> &rarr;
+                 &larr; <span class="nav-title nav-title-prev">{{ .PrevInSection.Title }}</span> 
+            </a>
+        {{ end }}
+        {{ if .NextInSection }}
+            <a rel="next" href="{{ .NextInSection.Permalink }}" id="next">
+                 <span class="nav-title nav-title-next">{{ .NextInSection.Title }}</span> &rarr;
             </a>
         {{ end }}
     </div>
