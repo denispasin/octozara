@@ -6,12 +6,28 @@ type: "post"
 categories: ["blog", "deploiement"]
 ---
 
-```ruby
-class Lol
-  def owi
-    p @owi
-  end
-end
-```
+En ce début d'année 2019 j'ai décidé qu'il en était assez de payer cher un serveur tous les ans et de fonctionner avec un vieux blog Jekyll basé sur ruby 2.2.
 
-test `lol` test
+Comme je n'avais pas vraiment envie de ré-écrire ou transformer tous mes markdown en quelque chose d'autre. Mon choix s'est porté vers [Hugo](https://gohugo.io/).
+
+De plus, pour le déploiement j'avais envie de prendre quelque chose de simple mais efficace, gratuit et automatisable (ce que mon précédent système n'était que très partiellement). Mon choix s'est porté vers [Now](https://zeit.co/now).
+
+Voici quelques retours d'expérience sur la transition.
+
+## Hugo
+
+Depuis octopress le transfert des article fut transparent et très simple. J'ai du adapter un peu certains helpers que je m'étais écrit mais rien de dramatique.
+
+Je trouve que la syntaxe d'écriture de shortcut et de layout hugo est particulièrement compliquée et étrange. On s'y fait mais il m'a fallut un moment.
+
+Autre souci, Hugo c'est nouveau et ça se sent. La doc est pas toujours excellente (notamment celle sur le highlight de code…) mais ça marche bien.
+
+Les templates sont nombreux mais de qualité un peu moindre que ce que j'avais pour octopress et il a fallut que j'adapte de gros bouts du mien pour le rendre pratique.
+
+Cela étant dit, maintenant que le plus dur est fait le reste devrait être très très simple.
+
+## Now
+
+Ça par contre je suis conquis, ça marche super bien, l'intégration avec github se fait en 30 seconde et l'intégration avec Hugo pareil.
+
+J'ai passé environ 5 minutes a gérer mon déploiement en entier.
