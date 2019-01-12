@@ -5,7 +5,9 @@ type: "post"
 categories: ["divers"]
 ---
 
-En cette fin d'année 2018, je suis tombé sur un [article](https://overreacted.io/things-i-dont-know-as-of-2018/) intéressant de Dan Abramov (Je cite: "Working on @reactjs. Co-author of Redux and Create React App.") sur ce qu'il ne savait pas faire en informatique pour indiquer qu'on peut ne pas savoir des choses sans pour autant remettre en cause son expertise.
+En cette fin d'année 2018, je suis tombé sur un [article](https://overreacted.io/things-i-dont-know-as-of-2018/) intéressant de Dan Abramov (Je cite: "Working on @reactjs. Co-author of Redux and Create React App."). 
+À l'interieur il y précise ce qu'il ne savait pas faire en informatique.
+L'objectif est de montrer qu'on peut ne pas savoir des choses sans pour autant remettre en cause son expertise.
 Vers la fin de son article, il propose, si l'ont ne se sent pas "vulnérable" de se prêter au jeu.
 
 J'ai trouvé l'article vraiment intéressant et j'aimerais me livrer au même genre d'exercice. Vous trouverez donc une liste non exhaustive de ce que je ne sais pas ou que très peu.
@@ -14,8 +16,8 @@ J'ai trouvé l'article vraiment intéressant et j'aimerais me livrer au même ge
 * **Hardware**: Je n'y connait rien du tout. Je sais que plus de RAM et de CPU c'est mieux mais c'est à peu près l'extension de mon savoir.
 * **Électronique**: Je sais a quoi sert une résistance et que le courant passe dans les fils. J'ai utilisé des transistor, condensateurs et bobines dans mes cours il y a plus de dix ans mais je n'en ai presque aucun souvenir.
 * **Bash**: Je suis incapable d'écrire le moindre script bash de plus de 10 lignes sans passer des heures dans la doc. Je dois regarder la doc de `ln` ou de `if` a chaque fois que je l'utilise. `xargs` c'est de la magie noire pour moi.
-* **Rails views**: Je dois google la doc de `form_for` à chaque fois que je veux l'utiliser, je pense que je serais capable d'écrire un site en erb/haml mais je serais lent et inefficace.
-* **Asset pipeline**: Je comprend l'idée de comment ça marche, je ne l'ai jamais tune pour de la production. Pareil pour des choses comme turbolinks, je sais que ça permet d'acceler le changement de page, mais c'est l'extension de mon savoir
+* **Rails views**: Je dois google la doc de `form_for` à chaque fois que je veux l'utiliser, je serais capable d'écrire un site en erb/haml mais je serais lent et inefficace.
+* **Asset pipeline**: Je comprend l'idée de comment ça marche, je ne l'ai jamais tune pour de la production. Pareil pour des choses comme turbolinks, je sais que ça permet d'accélérer le changement de page, mais c'est l'extension de mon savoir.
 * **jQuery**: Je pleure a chaque fois que je dois l'utiliser.
 * **Complexité**: Je pense que je serais capable de calculer des complexités simples mais il faudrait que je réouvre des cours pour n'importe quoi de plus complexe qu'un for dans un for. J'ai de bonnes notions intuitives mais je ne l'utilise jamais professionnellement. 
 * **Algorithmes**: Si j'ai l'explication sous les yeux je serais capable de l'implémenter mais me demandez pas comment marche un tri a bulle (ou n'importe quel autre forme de tri).
