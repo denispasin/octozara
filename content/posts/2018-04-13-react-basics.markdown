@@ -360,12 +360,14 @@ export default MonComponent
 
 Quand je dis que le state peut être modifié par le component… C'est vrai avec un bémol.
 Un component ne peut pas modifier une value de son state de cette manière:
+
 ```js
 this.state.message = "NOPE"
 ```
 
 Par contre il peut **remplacer** une value en faisant:
-```
+
+```js
 this.setState({
   message: "Yep",
 })
@@ -443,6 +445,7 @@ Pour l'instant notre formulaire a beau être magnifique, React n'a aucune connai
 On va donc lier chaque champ a un state
 
 * On ajoute le state
+
 ```js
 constructor(props) {
   super(props)
@@ -457,6 +460,7 @@ constructor(props) {
 Et on en profite pour lui donner des valeurs par défaut.
 
 * On update le render avec les valeurs du state:
+
 ```js
 <input type="text" name="name" value={this.state.name}/>
 […]
@@ -465,8 +469,10 @@ Et on en profite pour lui donner des valeurs par défaut.
 
 A cette étape là, la value de chaque input est complètement gérée par React. Comment on gère l'update du state ?
 
-* Update du state
-  * On ajoute des fonctions pour gerer chaque update
+##### Update du state
+
+* On ajoute des fonctions pour gerer chaque update
+
 ```js
 handleChangeName(name) {
   this.setState({
@@ -480,7 +486,9 @@ handleChangeAge(age) {
   })
 }
 ```
-  * On les trigger:
+
+* On les trigger:
+
 ```js
 <input
   type="text"
@@ -501,7 +509,7 @@ handleChangeAge(age) {
 />
 ```
 
-Le code final du component (a ce moent ressemble à):
+Le code final du component (a ce moment ressemble à):
 
 ```js
 import React from 'react'
