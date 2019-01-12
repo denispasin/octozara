@@ -1,7 +1,6 @@
 ---
 title: "Ce que je ne sais pas (2018)"
 date: 2019-01-09T20:28:44+09:00
-draft: true
 type: "post"
 categories: ["divers"]
 ---
