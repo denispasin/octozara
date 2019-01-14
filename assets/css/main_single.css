@@ -6,6 +6,11 @@
 
 @import url('https://fonts.googleapis.com/css?family=PT+Serif');
 
+html {
+  font-family: sans-serif;
+  text-size-adjust: 100%;
+}
+
 .site-wrapper,
 .off-canvas {
     transition: all .3s ease;
