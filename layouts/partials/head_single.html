@@ -1,8 +1,8 @@
 {{ partial "head_global.html" }}
   {{ $style := resources.Get "css/main_single.css" | minify | fingerprint }}
     {{ $patreon := resources.Get "css/patreon.css" | minify | fingerprint }}
-    <link async rel="stylesheet" type="text/css" href="{{ $style.Permalink }}" />
-    <link async rel="stylesheet" type="text/css" href="{{ $patreon.Permalink }}" />
+    <link defer rel="stylesheet" type="text/css" href="{{ $style.Permalink }}" />
+    <link defer rel="stylesheet" type="text/css" href="{{ $patreon.Permalink }}" />
     <link rel="preconnect" href="https://www.google-analytics.com" />
     <link rel="preconnect" href="https://s7.addthis.com" />
     <link rel="preconnect" href="http://graph.facebook.com" />
