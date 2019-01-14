@@ -1,0 +1,15 @@
+.become-patron-button {
+  display: inline-block;
+  height: 39px;
+  width: 171px
+}
+
+.patreon-text {
+  margin: 0 2%;
+}
+
+.main-patreon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

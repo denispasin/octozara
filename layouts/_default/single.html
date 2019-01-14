@@ -26,13 +26,13 @@
                     {{ .Content }}                    
                 </div>
                 <div class="feat share">
+                  {{ partial "addthis" . }}
+                  {{ partial "patreon" . }}
                 </div>
                 
                 {{ template "_internal/disqus.html" . }}
-                
             </article>
         </section>
-
         {{ partial "footer" . }}
     </div>
 
@@ -50,5 +50,7 @@
     </div>
 
     {{ partial "js" . }}
+    {{ partial "addthis_script" . }}
+    {{ partial "patreon_script" . }}
 </body>
 </html>

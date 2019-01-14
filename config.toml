@@ -20,6 +20,7 @@ pygmentsOptions="linenos=yesplease"
 
 	pageNotFoundTitle = "Page non trouvée"
 	pageNotFoundSubtitle = "La page que vous avez demandée <br> n'est pas attribuée."
+        addThis = "ra-5c3bc29f8cb4ba57"
 
 [params.offcanvas]
 	# Menu items
