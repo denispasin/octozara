@@ -4,6 +4,7 @@ theme = "sublime-hugo-theme"
 PygmentsCodeFences = true
 PygmentsStyle = "solarized-dark"
 pygmentsOptions="linenos=yesplease"
+Paginate=25
 [params]
         languageCode = "fr"
 	name = "Zaratan"
