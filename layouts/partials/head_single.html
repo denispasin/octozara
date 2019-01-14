@@ -1,4 +1,4 @@
-{{ partial "head_global.html" }}
+{{ partial "head_global.html" . }}
   {{ $style := resources.Get "css/main_single.css" | minify | fingerprint }}
     {{ $patreon := resources.Get "css/patreon.css" | minify | fingerprint }}
     <link defer rel="stylesheet" type="text/css" href="{{ $style.Permalink }}" />

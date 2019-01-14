@@ -1,11 +1,11 @@
 baseURL = "https://www.zaratan.fr"
-languageCode = "fr"
 title = "zaratan@next"
 theme = "sublime-hugo-theme"
 PygmentsCodeFences = true
 PygmentsStyle = "solarized-dark"
 pygmentsOptions="linenos=yesplease"
 [params]
+        languageCode = "fr"
 	name = "Zaratan"
 	description = "Les élucubrations d'un developpeur fatigué"
 	copyright = "Zaratan Copyright ©"
