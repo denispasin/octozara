@@ -1,7 +1,7 @@
 {{ partial "head_global.html" }}
   {{ $style := resources.Get "css/main.css" | minify | fingerprint }}
     <!-- <link rel="stylesheet" href="/css/smooth-scrollbar.css" /> -->
-    <link rel="stylesheet" type="text/css" href="{{ $style.Permalink }}" />
+    <link async rel="stylesheet" type="text/css" href="{{ $style.Permalink }}" />
     <link rel="preconnect" href="https://www.google-analytics.com" />
     <!-- {{ range .Site.Params.custom_css }}
     <link rel="stylesheet" href="{{ $.Site.BaseURL}}{{ . }}">
