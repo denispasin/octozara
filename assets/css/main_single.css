@@ -1,0 +1,500 @@
+/*! normalize.css v3.0.1 | MIT License | git.io/normalize */
+
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+@import url('https://fonts.googleapis.com/css?family=PT+Serif');
+
+.site-wrapper,
+.off-canvas {
+    transition: all .3s ease;
+}
+
+.h-wrap,
+.menu-icon,
+.off-canvas,
+footer {
+    padding: 1em;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+::after,
+::before {
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font: "Source Code Pro", monospace;
+    font-size: 1.25em;
+    color: #FFF;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    background-color: #272822;
+}
+
+body .single-wrap p {
+    font-size: 0.95em;
+}
+
+@media (max-width:942px) {
+    body .single-wrap p {
+        font-size: 0.9em;
+    }
+}
+
+
+h1,
+h2,
+h3,
+.h-wrap h1.title,
+.off-canvas .bio h1,
+h4,
+h5,
+h6,
+h5,
+h6 {
+    font-family: 'Source Code Pro', monospace;
+}
+
+h1 {
+    font-size: 1.8em;
+    margin: .5em 0;
+    font-weight: bold;
+}
+
+h2 {
+    /* font-size: 180%; */
+    margin: 1em 0 .5em;
+}
+
+h3,
+.h-wrap h1.title,
+.off-canvas .bio h1 {
+    /* font-size: 150%; */
+    font-weight: lighter;
+    /* margin: 1.5em 0 .5em; */
+}
+
+header.single {
+  display: inline;
+  position: fixed;
+  right: 0;
+  width: initial;
+}
+
+.h-wrap.single h1.title a {
+  background-color: #F92672;
+}
+
+.h-wrap.single .short-title{
+  display: inline;
+}
+
+.h-wrap.single a:hover .short-title{
+  display: none;
+}
+
+.h-wrap.single .full-title{
+  display: none;
+}
+
+.h-wrap.single a:hover .full-title{
+  display: inline;
+}
+
+@media (max-width:642px) {
+    body .h-wrap {
+        padding: 1em 0em;
+    }
+    body .h-wrap h1.title {
+        font-size: 1em;
+    }
+    body .h-wrap.single h1.title {
+        padding-right: 0.5em;
+    }
+    body .single-wrap h1.page-title {
+        font-size: 3em;
+    }
+    body .single-wrap p {
+        font-size: .875em;
+    }
+}
+
+@media (max-width:1115px) {
+  .next-prev-arrows {
+    display: none;
+  }
+}
+
+h4,
+h5,
+h6 {
+    font-size: 80%;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin: 3.5em 0 .5em;
+    color: #999;
+}
+
+h5 {
+    text-align: center;
+}
+
+h6 {
+    text-align: right;
+}
+
+p {
+    margin: 1.3em 0;
+    line-height: 1.6;
+}
+
+small {
+    font-size: 60%
+}
+
+ul li {
+    list-style-type: disc;
+    margin-left: 0em;
+    list-style-position:inside;
+}
+
+ol li {
+  margin-left: 0em;
+  list-style-position:inside;
+}
+
+ol li p {
+  margin: 0;
+  line-height: 1;
+  display: inline;
+}
+
+ul li p {
+  margin: 0;
+  line-height: 1;
+  display: inline;
+}
+
+ul li ul {
+  padding-left: 1em;
+  margin: 0 !important;
+  margin-top: 0.3em !important;
+}
+
+ul li ul li {
+    list-style-type: circle;
+}
+
+ol li {
+    list-style-type: decimal;
+}
+
+a:hover {
+    color: #333;
+}
+
+@font-face {
+    font-family: icomoon;
+    src: url(/fonts/icomoon.eot);
+    src: url(/fonts/icomoon.eot?#iefix) format("embedded-opentype"), url(/fonts/icomoon.woff) format("woff"), url(/fonts/icomoon.ttf) format("truetype"), url(/fonts/icomoon.svg#icomoon) format("svg");
+    font-weight: 400;
+    font-style: normal;
+}
+
+.highlight {
+    border-radius: 3px;
+    font-size: 80%;
+    margin: 2em auto;
+    overflow: scroll;
+    color: gray;
+}
+
+code {
+    font-family: Courier, monospace;
+    font-size: 100%;
+    line-height: 1.5;
+}
+
+header {
+    width: 100%;
+    position: fixed;
+
+    z-index: 999;
+}
+
+.h-wrap h1.title {    
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.2em;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    font-weight: 400;
+}
+
+.h-wrap h1.title a {
+    color: #333;
+    background: #f8f8ed;
+    padding: 0.6em 0.8em;
+    z-index: 999;
+    text-decoration: none;
+}
+
+.h-wrap h1.title a:hover {
+    color: #FFF;
+    background: #000;
+}
+
+.h-wrap h1.title a:active {
+    filter: blur(1px);
+}
+
+.site-wrapper {
+    position: fixed;
+    box-sizing: border-box;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100vh;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+footer {
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+}
+
+footer small {
+    text-transform: uppercase;
+}
+
+.single-wrap {
+    color: #000;
+    width: 100%;
+    max-width: 980px;
+    margin: 1em auto 0;
+    background: #f8f8ed;
+    z-index: 1;
+    text-rendering: optimizeLegibility;
+    word-wrap: break-word;
+    -webkit-font-variant-ligatures: common-ligatures;
+    font-variant-ligatures: common-ligatures;
+    -webkit-font-feature-settings: 'liga', 'clig';
+    font-feature-settings: 'liga', 'clig';
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto; 
+    font-family: "Open Sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+}
+
+.single-wrap .single-content {
+    padding: 0 2em;
+}
+
+@media (max-width:642px) {
+    .single-wrap .single-content {
+        padding: 0em 1.4em 3.5em 1.4em;
+    }
+}
+
+.single-wrap .feat.share {
+    text-align: center;
+    margin: 3.5em auto 0;
+}
+
+@media (min-width: 642px) {
+  .single-wrap .feat.share {
+    padding-bottom: 3.5em;
+  }
+}
+
+.single-wrap .page-date {
+    display: inline-block;
+    position: relative;
+    top: 1.1em;
+    background: #f8f8ed;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 85%;
+    text-align: center;
+    font-weight: 400;
+    padding: 0 1em;
+    text-transform: none;
+    letter-spacing: 1px;
+}
+
+.single-wrap .share {
+    margin: 3.5em auto;
+}
+
+.single-wrap h1.page-title {
+    font-size: 3em;
+    line-height: 135%;
+    font-family: serif;
+    font-style: italic;
+    text-align: center;
+    margin: 0 0 40px 0;
+}
+
+.single-wrap h1, .single-wrap h2, .single-wrap h3 {
+    font-family: 'Open Sans', monospace;
+}
+
+.single-wrap em {
+    font-family: 'Source Code Pro', monospace;
+}
+
+.single-wrap ul,
+.single-wrap ol {
+    margin: 2em 0;
+}
+
+.single-wrap ul li,
+.single-wrap ol li {
+    margin-bottom: .5em;
+}
+
+.single-wrap blockquote {
+    font-family: 'Source Code Pro', monospace;
+    border-left: 4px solid rgba(80, 82, 84, 0.3);
+    padding-left: 1em;
+    margin-right: 0;
+    line-height: 165%;
+}
+
+@media (max-width:942px) {
+    .single-wrap blockquote {
+        margin-left: 0;
+    }
+}
+
+.single-wrap blockquote p {
+    padding-left: 0!important;
+    padding-right: 0!important;
+}
+
+.single-wrap img {
+    width: 100%;
+    height: 100%;
+}
+
+#prev,
+#next {
+    font-size: 0.9em;
+    position: fixed;
+    text-decoration: none;
+    background: #f8f8ed;
+    /*border: 1px solid #3b3b3b;*/
+    padding: 10px;
+    line-height: 1;
+    border-radius: 25px;    
+    bottom: 30px;
+    color: #333;
+}
+
+
+#prev:hover,
+#next:hover {
+    border-radius: 0px;
+    border: 2px solid #3b3b3b;
+}
+
+#prev {
+    left: 30px;
+}
+
+#next {
+    right: 30px;
+}
+
+#prev:active,
+#next:active {
+    color: rgba(187, 189, 187, 0.8);
+    border-color: rgba(187, 189, 187, 0.8);
+    filter: blur(1px);
+}
+
+.nav-title {
+    display: none;
+}
+
+.nav-title-prev,
+.nav-title-next {
+    font-family: 'Source Code Pro', monospace;
+}
+
+.nav-title-prev {
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+.nav-title-next {
+    margin-right: 10px;
+    margin-left: 5px;
+}
+
+#prev:hover .nav-title,
+#next:hover .nav-title {
+    display: inline;
+}
+
+code.hljs {
+  font-size: 1.2em;
+  line-height: 1.3;
+}
+
+code:not(.hljs):not(.language-yaml):not(.language-erb):not(.language-scss) {
+  background: lightgray;
+  border-radius: 1px;
+}
+
+code.language-yaml {
+  font-size: 1.2em;
+  line-height: 1.3;
+}
+
+code.language-erb {
+  font-size: 1.2em;
+  line-height: 1.3;
+}
+
+code.language-scss {
+  font-size: 1.2em;
+  line-height: 1.3;
+}
+
+.highlight table {
+  padding: 0.5em !important;
+}
+
+.highlight table tr:only-child td {
+  min-width: 23px
+}
+
+.filename {
+  margin-bottom: -1.6em;
+  position: relative;
+  border-left: solid 1px lightgray;
+  display: block;
+  border-top: solid 1px lightgray;
+  border-right: solid 1px lightgray;
+  background-color: #bbb;
+  border-radius: 3px 3px 0 0;
+  padding-left: .5em;
+  padding-bottom: .1em;
+}

@@ -1,24 +1,7 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-  <!--[if gt IE 8]><!--> <html class="no-js" lang="{{with .Site.LanguageCode}}{{ . }}{{end}}"> <!--<![endif]-->
-<head>
-    <title>{{ .Title }} {{ if .IsPage }} &middot; {{ .Site.Title }} {{ end }}</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta http-equiv="content-language" content="{{ with .Site.LanguageCode }}{{ . }}{{ end }}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="{{ with .Site.Params.name }}{{ . }}{{ end }}">
-    <meta name="description" content="{{ with .Site.Params.description }}{{ . }}{{ end }}">
-    {{ .Hugo.Generator }}
-
-    {{ "<!-- Stylesheets -->" | safeHTML }}
-    {{ $style := resources.Get "css/main.css" | minify | fingerprint }}
-    {{ $patreon := resources.Get "css/patreon.css" | minify | fingerprint }}
+{{ partial "head_global.html" }}
+  {{ $style := resources.Get "css/main.css" | minify | fingerprint }}
     <!-- <link rel="stylesheet" href="/css/smooth-scrollbar.css" /> -->
     <link rel="stylesheet" type="text/css" href="{{ $style.Permalink }}" />
-    <link rel="stylesheet" type="text/css" href="{{ $patreon.Permalink }}" />
     <link rel="preconnect" href="https://www.google-analytics.com" />
     <!-- {{ range .Site.Params.custom_css }}
     <link rel="stylesheet" href="{{ $.Site.BaseURL}}{{ . }}">
