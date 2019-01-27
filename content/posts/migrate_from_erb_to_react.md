@@ -9,6 +9,8 @@ categories:
 
 Le but de cet article est de donner une marche a suivre pour migrer à sa propre vitesse d'une front rails classique (ici à base de Erb) vers une solution basée sur un front en JS (ici en React) géré par Webpacker.
 
+**DISCLAMER**: Ceci n'est pas un tuto a React. Pour un tuto basique pour React vous pouvez aller [ici](../2018-04-13-react-basics). 
+
 {{< youtube IhEM7-FxmF0 >}}
 
 ## Présentation de l'app
@@ -156,16 +158,247 @@ bin/webpack-dev-server
 ## Votre première vue
 
 ### Méthodologie
+
+Je vais vous donner quelques conseils (et avis) quant à l'architecture de votre App et comment procéder à la migration:
+
+* Vos "Données" (ici les posts et le current_user) devraient vivre dans votre component App et être donné aux enfants. Un seul point de vérité.
+* Vos méthodes pour récupérer vos données et faire des actions devraient aller dans `app/javascript/src/APIs` (ici dans un fichier `posts.js`).
+* Vos components devraient aller dans un dossier `app/javascript/src/components`.
+* Déplacez votre erb tel quel et éditez le dans le component. Ça vous évitera d'oublier des choses.
+* Commencez par afficher les choses puis ajoutez ensuite les actions une par une avec votre backend.
+
 ### Récupérer des données
 
 Si vous voulez suivre la vidéo en même temps: [Youtube](https://youtu.be/IhEM7-FxmF0?t=1598) (jusqu'à 53:13)
+
+Pour récupérer nos données et les afficher on va procéder en 4 étapes.
+
+#### 1. Faire en sorte que rails réponde du JSON.
+
+On utilise `respond_to` et `format` ([doc](https://api.rubyonrails.org/classes/ActionController/MimeResponds.html)), et on renvoi du JSON (pour des raisons de facilité je conseille d'utiliser [ActiveModel Serializer](https://github.com/rails-api/active_model_serializers/tree/0-10-stable))
+
+Je conseille pour une utilisation facile mais pratique de ActiveModel Serializer de configurer son adapteur en mode `:json`.
+{{< filename "config/initializers/ams.rb" >}}
+```rb
+ActiveModelSerializers.config.adapter = :json
+```
+
+On crée nos serializers de cette façon:
+
+{{< filename "app/serializers/post_serializer.rb" >}}
+```rb 
+class PostSerializer < ActiveModel::Serializer
+  attributes :id, :text
+
+  belongs_to :author, serializer: AuthorSerializer
+end
+```
+
+{{< filename "app/serializers/author_serializer.rb" >}}
+```rb 
+class AuthorSerializer < ActiveModel::Serializer
+  attributes :id, :username
+end
+```
+
+Ces fichiers permettent de définir les informations qui seront renvoyées pour chaque type d'objet.
+
+
+Puis on édite notre controller pour transformer notre méthode index depuis 
+{{< filename "app/controller/posts_controller.rb" >}}
+```rb 
+def index
+  @new_post = Post.new
+  @posts = Post.all.order(created_at: :desc).includes(:author)
+end
+```
+
+Vers
+{{< filename "app/controller/posts_controller.rb" >}}
+```rb 
+def index
+  @posts = Post.all.order(created_at: :desc).includes(:author)
+  respond_to do |format|
+    format.html do
+      @new_post = Post.new
+    end
+    format.json do
+      render json: @posts
+    end
+  end
+end
+```
+
+Le but ici étant de créer un comportement différents pour quand on nous demandera du JSON.
+
+Le format de réponse de notre API sera ici: 
+```json
+{
+  "posts": [
+    {
+      "id": "…",
+      "text": "text post",
+      "author": { "id": "…", "username": "zaratan" }
+    },
+    …
+  ]
+}
+```
+
+Il va être maintenant temps d'appeler cette API depuis votre app React.
+
+#### 2. Créer un fichier pour faire des appels API et lire du JSON.
+
+On crée un fichier simple en JS pour faire cet appel en utilisant [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch):
+
+{{< filename "app/javascript/src/APIs/posts.js">}}
+```js
+export const fetchPosts = async () => {
+  // On va chercher la donnée
+  const postsResponse = await fetch('/posts', {
+    // Ces headers nous permettent de dire a notre app Rails: Je veux du json PLZ
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  });
+  // On parse le body de la réponse en json pour obtenir un objet JS.
+  const postsJSON = await postsResponse.json();
+  // On supprime le fait que les posts soient rangés dans "posts"
+  return postsJSON.posts;
+};
+```
+
+#### 3. Appeler ces méthodes dans le component App.
+
+Notre component App va être responsable des données.
+
+On lui déclare donc un state:
+```js
+state = {
+  posts: []
+}
+```
+
+Puis, une fois que le component est chargé sur la page, on lui dit d'aller chercher les données:
+```js
+import { fetchPosts } from './APIs/posts';
+
+[…]
+
+export default class App extends Component {
+  state = {
+    posts: []
+  }
+
+  refreshPosts = async () => {
+    const posts = await fetchPosts();
+    this.setState({
+      posts,
+    });
+  };
+
+  componentDidMount = async () => {
+    await this.refreshPosts();
+  };
+
+  […]
+}
+```
+
+#### 4. Se servir de ces données pour afficher des components.
+
+On se sert ensuite des données qui seront dans notre state a un moment pour afficher les différents Post.
 
 ### Envoyer des données et actions
 
 Si vous voulez suivre la vidéo en même temps: [Youtube](https://youtu.be/IhEM7-FxmF0?t=3192) (jusqu'à 1:12:56)
 
+Vous procédez de même pour les différentes actions en ajoutant les méthodes correspondantes dans le fichier d'API et dans le controller.
+
+Example du create:
+
+{{< filename "app/controller/posts_controller.rb" >}}
+```rb
+def create
+  post = Post.create!(create_params.merge(author: current_user))
+  respond_to do |format|
+    format.html do
+      redirect_to root_path
+    end
+    format.json do
+      render json: post
+    end
+  end
+end
+```
+
+{{< filename "app/javascript/src/APIs/posts.js" >}}
+```js
+export const addPost = async ({ text }) => {
+  const postResponse = await fetch('/posts', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(addCsrf({ post: { text } })),
+  });
+  const postJSON = await postResponse.json();
+  return postJSON;
+};
+```
+
+Les points importants sont:
+
+#### Le CSRF
+
+Dans toutes les méthodes qui ne sont pas des GET vous allez avoir besoin de renseigner le CSRF (généré automatiquement par Rails).
+
+Personnellement je le gère de cette façon:
+
+J'ai une méthode `addCsrf`:
+```js
+const addCsrf = object => {
+  const token = document.querySelector('meta[name=csrf-token]').content;
+  const key = document.querySelector('meta[name=csrf-param]').content;
+  object[key] = token;
+  return object;
+};
+```
+
+que j'utilise pour compléter les body de mes requêtes:
+```js
+body: JSON.stringify(addCsrf({ post: { text } })),
+```
+
+#### La gestion des erreurs
+
+Personnellement je renvoi des trames JSON ressemblant à:
+```json
+{ "errors": ["str_1", …]}
+```
+
 ## Et après ?
 
 ### Le Routing
+
+Personnellement j'utilise le routing de Rails tant que je peux pas migrer complètement a React. Chaque page a sa propre App (que je renomme page genre PostsPages, UserPage, etc…)
+
 ### Le CSS
+
+Vous pouvez ensuite migrer votre css dans React en utilisant une des nombreuses _sigh_ solutions disponibles (Ma préférée étant StyledComponents en ce moment mais j'en ferai peut-être un article a part entière).
+
 ### Le déploiement
+
+Sur Heroku vous n'avez rien a faire de plus :) C'est pas magique ? 
+
+### La pagination
+
+ActiveModelSerializers gère très bien la pagination avec Kaminari :)
+
+## Conclusion
+
+Ça devrait faire un bon article pour débuter une migration d'un Front Rails vers React. Je ne conseille en aucun cas de tout migrer d'un coup. Le travail peut être titanesque et vous avez clairement mieux a faire de votre temps généralement.
+
+À bientôt <3
