@@ -42,6 +42,9 @@ Plusieurs raisons peuvent vous pousser a amener Webpacker dans votre application
 Le présent article s'adresse plus au point 2 qu'au point 1 même si vous pourriez utiliser pas mal de points de cet article pour vous aider dans le premier cas.
 
 ## Initialisation de Webpacker
+
+Si vous voulez suivre la vidéo en même temps: [Youtube](https://youtu.be/IhEM7-FxmF0?t=384) (jusqu'à 26:52)
+
 ### Installation de Webpacker
 ### Installation de React
 ### Plug de votre application dans votre/vos views
@@ -50,7 +53,12 @@ Le présent article s'adresse plus au point 2 qu'au point 1 même si vous pourri
 
 ### Méthodologie
 ### Récupérer des données
+
+Si vous voulez suivre la vidéo en même temps: [Youtube](https://youtu.be/IhEM7-FxmF0?t=159://youtu.be/IhEM7-FxmF0?t=1598) (jusqu'à 53:13)
+
 ### Envoyer des données et actions
+
+[Youtube](https://youtu.be/IhEM7-FxmF0?t=3192) (jusqu'à 1:12:56)
 
 ## Et après ?
 
