@@ -7,19 +7,19 @@ categories:
   - code
 ---
 
-Le but de cet article est de donner une marche a suivre pour migrer à sa propre vitesse d'une front rails classique (ici à base de Erb) vers une solution basée sur un front en JS (ici en React) géré par Webpacker.
+Le but de cet article est de donner une marche à suivre pour migrer à sa propre vitesse d'un front rails classique (ici à base de Erb) vers une solution basée sur un front en JS (ici en React) géré par Webpacker.
 
-**DISCLAMER**: Ceci n'est pas un tuto a React. Pour un tuto basique pour React vous pouvez aller [ici](../2018-04-13-react-basics). 
+**DISCLAMER** : Ceci n'est pas un tuto React. Pour un tuto basique pour React, vous pouvez aller [ici](../2018-04-13-react-basics). 
 
 {{< youtube IhEM7-FxmF0 >}}
 
 ## Présentation de l'app
 
-On va ici prendre une application assez basique comme exemple mais c'est repliable juste plus long sur des applications de taille normale. 
+On va prendre ici une application assez basique comme exemple. C'est réplicable sur des applications de taille normale, mais c'est plus long.
 
-C'est une seule page pour visualiser des posts (ou route) et 3 actions, Create/Update/Delete.
+Il s'agit d'une seule page pour visualiser des posts et 3 actions, Create/Update/Delete.
 La page est protégée par une authentification via devise et affiche au besoin des erreurs de créations/update.
-De plus l'application vérifie que vous ayez bien les droits d'effectuer une action avant de la faire via la gem pundit.
+De plus, l'application vérifie que vous avez bien les droits d'effectuer une action avant de la faire via la gem [pundit](https://github.com/varvet/pundit).
 
 Vous pourrez trouver le code [ici](https://github.com/denispasin/rails_to_webpack/tree/start_rails).
 
@@ -29,23 +29,23 @@ Ceci devrait ressembler peu ou prou à la stack d'une application standard de Ra
 
 Webpacker est un moyen d'utiliser facilement Webpack en conjonction avec Rails.
 
-Qu'est ce que Webpack ? C'est un outil pour bundle et compiler des assets ensemble à l'image de l'assets pipeline de Rails.
+Qu'est ce que Webpack ? C'est un outil pour compacter et compiler des assets ensemble, à l'image de l'assets pipeline de Rails.
 Il est très utilisé dans l'écosystème JavaScript.
 
-(Si vous vous demandez pourquoi facilement, je vous renvoi vers mon article sur le [sujet](../2018-03-30-webpack-basics).)
+(Si vous vous demandez pourquoi j'ai écrit "_facilement_", je vous renvoie vers mon article sur le [sujet](../2018-03-30-webpack-basics).)
 
-## Pourquoi feriez vous ça ?
+## Pourquoi feriez-vous ça ?
 
-Plusieurs raisons peuvent vous pousser a amener Webpacker dans votre application.
+Plusieurs raisons peuvent vous pousser à ajouter Webpacker dans votre application.
 
-* Vous voulez utiliser facilement les _nombreux_ packages disponibles de l'écosystème JavaScript sans le brancher dans l'assets pipeline.
-* Vous voulez amener React/Vue/Else dans votre application et ne voulez pas recréer une application front ex-nilo mais déplacer petit à petit des bouts de votre app vers une de ces applications sans recoder toutes les vues de Devise par exemple.
+* Vous voulez utiliser facilement les _nombreux_ packages disponibles de l'écosystème JavaScript sans les brancher dans l'assets pipeline.
+* Vous voulez amener React/Vue/Else dans votre application et ne voulez pas recréer une application front ex-nilo, mais déplacer petit à petit des bouts de votre app vers une de ces applications, sans recoder toutes les vues de Devise par exemple.
 
-Le présent article s'adresse plus au point 2 qu'au point 1 même si vous pourriez utiliser pas mal de points de cet article pour vous aider dans le premier cas.
+Le présent article s'adresse plus au point 2 qu'au point 1, même si vous pourriez utiliser pas mal de points de cet article pour vous aider dans le premier cas.
 
 ## Initialisation de Webpacker
 
-Si vous voulez suivre la vidéo en même temps: [Youtube](https://youtu.be/IhEM7-FxmF0?t=384) (jusqu'à 26:52)
+Si vous voulez suivre la vidéo en même temps : [Youtube](https://youtu.be/IhEM7-FxmF0?t=384) (jusqu'à 26:52)
 
 On va commencer par faire le bout de plomberie qui va nous permettre de travailler ensuite. C'est à dire amener une app React minimaliste à l'intérieur d'une de nos vues.
 
@@ -55,7 +55,7 @@ Ces étapes là vont aller assez vite.
 
 On va directement suivre la [doc de webpacker](https://github.com/rails/webpacker) pour ça (et on va prendre soin d'utiliser la version @next de webpacker qui apporte un bon lot de fonctionnalités). 
 
-On ajoute a notre `Gemfile`:
+On ajoute a notre `Gemfile` :
 
 ```ruby
 gem 'webpacker', '>= 4.0.x'
@@ -68,36 +68,36 @@ bundle install
 yarn add @rails/webpacker@next
 ```
 
-Enfin on initialise Webpacker:
+Enfin on initialise Webpacker
 
 ```bash
 bundle exec rails webpacker:install
 ```
 
-Ici vous avez déjà webpacker presque opérationnel. On va effectuer quelques petites modification dans notre config/webpacker.yml:
+Ici vous avez déjà webpacker presque opérationnel. On va effectuer quelques petites modifications dans notre config/webpacker.yml :
 
-* Remplacer tous les `localhost` par `0.0.0.0`. Ça fait que vous pouvez accéder a votre site sur n'importe quelle URL et vous aurez accès a Webpack.
-* Changer `extract_css` à `true` ça fera que tous vos fichiers CSS importés seront automatiquement exportés.
-* En development, changez `hmr` à `true`. Vous ne déclencherez plus de full reload a chaque changement de component dans React.
+* Remplacer tous les `localhost` par `0.0.0.0`. Ça fait que vous pouvez accéder à votre site sur n'importe quelle URL et vous aurez accès à Webpack.
+* Changer `extract_css` à `true`, ça fera que tous vos fichiers CSS importés seront automatiquement exportés.
+* En development, changez `hmr` à `true`. Vous ne déclencherez plus de full reload à chaque changement de component dans React.
 
 ### Installation de React
 
-On laisse webpacker ajouter les fichiers minimaux pour notre app React:
+On laisse webpacker ajouter les fichiers minimaux pour notre app React :
 
 ```
 bundle exec rails webpacker:install:react
 ```
 
 On va ensuite renommer ça et déplacer des fichiers. C'est l'occasion de parler un peu du dossier `app/javascript`. Vous aurez dedans un dossier spécial nommé `packs`.
-Dans ce dossier ne devra aller que les endpoints que vous voulez exposer dans votre application (ici on en veut qu'un seul: `application.js`).
+Dans ce dossier ne devra aller que les endpoints que vous voulez exposer dans votre application (ici on n'en veut qu'un seul : `application.js`).
 
 * Supprimez le fichier `app/javascript/packs/application.js`.
 * Renommez le fichier `app/javascript/packs/hello-react.jsx` en `app/javascript/packs/application.jsx`.
 * Créez un dossier `app/javascript/src`. C'est ici que nous mettrons tous les autres fichiers de l'application.
 * Créez un fichier `app/javascript/src/App.jsx`. Dans ce fichier créez un component React minimaliste.
-* Éditez votre fichier `app/javascript/packs/application.jsx` pour importer le component `App` et le rendre et supprimez le component par défaut contenu dans le fichier.
+* Éditez votre fichier `app/javascript/packs/application.jsx` pour importer le component `App` et le `render`. Ensuite, supprimez le component par défaut contenu dans le fichier.
 
-Normalement si vous avez bien tout fait,vos fichiers devraient ressembler à:
+Normalement si vous avez bien tout fait, vos fichiers devraient ressembler à :
 
 {{< filename "app/javascript/packs/application.jsx" >}}
 ```js application.jsx
@@ -125,27 +125,27 @@ export default class App extends Component {
 }
 ```
 
-Votre "App" est prête a être plug dans vos views classiques.
+Votre "App" est prête à être plug dans vos views classiques.
 
 ### Plug de votre application dans votre/vos views
 
-Dans votre view (ici `/app/view/posts/index.js`), on va ajouter en fin de fichier la ligne:
+Dans votre view (ici `/app/view/posts/index.js`), on va ajouter en fin de fichier la ligne :
 
 ```html
 <%= javascript_pack_tag 'application' %>
 ```
 
-De plus on va ajouter la div qui recevra notre app a terme:
+De plus, on va ajouter la div qui recevra notre app à terme :
 
 ```html
 <div id="app-container"></div>
 ```
 
-Il reste plus qu'à tester maintenant.
+Il ne reste plus qu'à tester maintenant.
 
 ### Lancez votre app webpack-dev-server
 
-Maintenant il faut lancer les deux serveurs dans 2 terminaux différents:
+Il faut lancer les deux serveurs dans 2 terminaux différents :
 
 ```bash
 # Votre serveur Rails classique
@@ -159,31 +159,31 @@ bin/webpack-dev-server
 
 ### Méthodologie
 
-Je vais vous donner quelques conseils (et avis) quant à l'architecture de votre App et comment procéder à la migration:
+Je vais vous donner quelques conseils (et avis) quant à l'architecture de votre App et comment procéder à la migration :
 
 * Vos "Données" (ici les posts et le current_user) devraient vivre dans votre component App et être donné aux enfants. Un seul point de vérité.
 * Vos méthodes pour récupérer vos données et faire des actions devraient aller dans `app/javascript/src/APIs` (ici dans un fichier `posts.js`).
 * Vos components devraient aller dans un dossier `app/javascript/src/components`.
-* Déplacez votre erb tel quel et éditez le dans le component. Ça vous évitera d'oublier des choses.
+* Déplacez votre erb tel quel et éditez-le dans le component. Ça vous évitera d'oublier des choses.
 * Commencez par afficher les choses puis ajoutez ensuite les actions une par une avec votre backend.
 
 ### Récupérer des données
 
-Si vous voulez suivre la vidéo en même temps: [Youtube](https://youtu.be/IhEM7-FxmF0?t=1598) (jusqu'à 53:13)
+Si vous voulez suivre la vidéo en même temps : [Youtube](https://youtu.be/IhEM7-FxmF0?t=1598) (jusqu'à 53:13)
 
 Pour récupérer nos données et les afficher on va procéder en 4 étapes.
 
 #### 1. Faire en sorte que rails réponde du JSON.
 
-On utilise `respond_to` et `format` ([doc](https://api.rubyonrails.org/classes/ActionController/MimeResponds.html)), et on renvoi du JSON (pour des raisons de facilité je conseille d'utiliser [ActiveModel Serializer](https://github.com/rails-api/active_model_serializers/tree/0-10-stable))
+On utilise `respond_to` et `format` ([doc](https://api.rubyonrails.org/classes/ActionController/MimeResponds.html)), et on renvoie du JSON (pour des raisons de facilité je conseille d'utiliser [ActiveModel Serializer](https://github.com/rails-api/active_model_serializers/tree/0-10-stable))
 
-Je conseille pour une utilisation facile mais pratique de ActiveModel Serializer de configurer son adapteur en mode `:json`.
+Pour une utilisation facile mais pratique de ActiveModel Serializer il faut configurer son adapteur en mode `:json`.
 {{< filename "config/initializers/ams.rb" >}}
 ```rb
 ActiveModelSerializers.config.adapter = :json
 ```
 
-On crée nos serializers de cette façon:
+On crée nos serializers de cette façon :
 
 {{< filename "app/serializers/post_serializer.rb" >}}
 ```rb 
@@ -204,7 +204,7 @@ end
 Ces fichiers permettent de définir les informations qui seront renvoyées pour chaque type d'objet.
 
 
-Puis on édite notre controller pour transformer notre méthode index depuis 
+Puis on édite notre controller pour transformer notre méthode index depuis :
 {{< filename "app/controller/posts_controller.rb" >}}
 ```rb 
 def index
@@ -213,7 +213,8 @@ def index
 end
 ```
 
-Vers
+Vers :
+
 {{< filename "app/controller/posts_controller.rb" >}}
 ```rb 
 def index
@@ -229,9 +230,9 @@ def index
 end
 ```
 
-Le but ici étant de créer un comportement différents pour quand on nous demandera du JSON.
+Le but ici étant de créer un comportement différent quand on nous demandera du JSON.
 
-Le format de réponse de notre API sera ici: 
+Le format de réponse de notre API sera : 
 ```json
 {
   "posts": [
@@ -245,7 +246,7 @@ Le format de réponse de notre API sera ici:
 }
 ```
 
-Il va être maintenant temps d'appeler cette API depuis votre app React.
+Il va être temps d'appeler cette API depuis votre app React \o/.
 
 #### 2. Créer un fichier pour faire des appels API et lire du JSON.
 
@@ -273,14 +274,14 @@ export const fetchPosts = async () => {
 
 Notre component App va être responsable des données.
 
-On lui déclare donc un state:
+On lui déclare donc un state :
 ```js
 state = {
   posts: []
 }
 ```
 
-Puis, une fois que le component est chargé sur la page, on lui dit d'aller chercher les données:
+Puis, une fois que le component est chargé sur la page, on lui dit d'aller chercher les données :
 ```js
 import { fetchPosts } from './APIs/posts';
 
@@ -308,15 +309,15 @@ export default class App extends Component {
 
 #### 4. Se servir de ces données pour afficher des components.
 
-On se sert ensuite des données qui seront dans notre state a un moment pour afficher les différents Post.
+On se sert ensuite des données qui seront dans notre state à un moment pour afficher les différents Post.
 
 ### Envoyer des données et actions
 
-Si vous voulez suivre la vidéo en même temps: [Youtube](https://youtu.be/IhEM7-FxmF0?t=3192) (jusqu'à 1:12:56)
+Si vous voulez suivre la vidéo en même temps : [Youtube](https://youtu.be/IhEM7-FxmF0?t=3192) (jusqu'à 1:12:56)
 
 Vous procédez de même pour les différentes actions en ajoutant les méthodes correspondantes dans le fichier d'API et dans le controller.
 
-Example du create:
+Example du create :
 
 {{< filename "app/controller/posts_controller.rb" >}}
 ```rb
@@ -349,15 +350,15 @@ export const addPost = async ({ text }) => {
 };
 ```
 
-Les points importants sont:
+Les points importants sont :
 
 #### Le CSRF
 
-Dans toutes les méthodes qui ne sont pas des GET vous allez avoir besoin de renseigner le CSRF (généré automatiquement par Rails).
+Dans toutes les méthodes qui ne sont pas des GET, vous allez avoir besoin de renseigner le CSRF (généré automatiquement par Rails).
 
-Personnellement je le gère de cette façon:
+Personnellement, je le gère de cette façon :
 
-J'ai une méthode `addCsrf`:
+J'ai une méthode `addCsrf` :
 ```js
 const addCsrf = object => {
   const token = document.querySelector('meta[name=csrf-token]').content;
@@ -367,14 +368,14 @@ const addCsrf = object => {
 };
 ```
 
-que j'utilise pour compléter les body de mes requêtes:
+que j'utilise pour compléter les body de mes requêtes :
 ```js
 body: JSON.stringify(addCsrf({ post: { text } })),
 ```
 
 #### La gestion des erreurs
 
-Personnellement je renvoi des trames JSON ressemblant à:
+Personnellement je renvoie des trames JSON ressemblant à :
 ```json
 { "errors": ["str_1", …]}
 ```
@@ -383,15 +384,15 @@ Personnellement je renvoi des trames JSON ressemblant à:
 
 ### Le Routing
 
-Personnellement j'utilise le routing de Rails tant que je peux pas migrer complètement a React. Chaque page a sa propre App (que je renomme page genre PostsPages, UserPage, etc…)
+J'utilise le routing de Rails tant que je ne peux pas migrer complètement à React. Chaque page à sa propre App (que je renomme page, par exemple PostsPages, UserPage, etc…)
 
 ### Le CSS
 
-Vous pouvez ensuite migrer votre css dans React en utilisant une des nombreuses _sigh_ solutions disponibles (Ma préférée étant StyledComponents en ce moment mais j'en ferai peut-être un article a part entière).
+Vous pouvez ensuite migrer votre css dans React en utilisant une des nombreuses (_soupir_) solutions disponibles (Ma préférée étant StyledComponents en ce moment mais j'en ferai peut-être un article à part entière).
 
 ### Le déploiement
 
-Sur Heroku vous n'avez rien a faire de plus :) C'est pas magique ? 
+Sur Heroku vous n'avez rien à faire de plus :) C'est pas magique ? 
 
 ### La pagination
 
@@ -399,8 +400,9 @@ ActiveModelSerializers gère très bien la pagination avec Kaminari :)
 
 ## Conclusion
 
-Voici le code final de l'exercice: https://github.com/denispasin/rails_to_webpack/pull/1
+Voici le code final de l'exercice : https://github.com/denispasin/rails_to_webpack/pull/1
 
-Ça devrait faire un bon article pour débuter une migration d'un Front Rails vers React. Je ne conseille en aucun cas de tout migrer d'un coup. Le travail peut être titanesque et vous avez clairement mieux a faire de votre temps généralement.
+Ça devrait faire un bon article pour débuter une migration d'un Front Rails vers React.
+Je ne conseille en aucun cas de tout migrer d'un coup. Le travail peut être titanesque et vous avez clairement mieux à faire de votre temps.
 
 À bientôt <3
