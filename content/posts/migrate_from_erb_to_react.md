@@ -399,6 +399,8 @@ ActiveModelSerializers gère très bien la pagination avec Kaminari :)
 
 ## Conclusion
 
+Voici le code final de l'exercice: https://github.com/denispasin/rails_to_webpack/pull/1
+
 Ça devrait faire un bon article pour débuter une migration d'un Front Rails vers React. Je ne conseille en aucun cas de tout migrer d'un coup. Le travail peut être titanesque et vous avez clairement mieux a faire de votre temps généralement.
 
 À bientôt <3
