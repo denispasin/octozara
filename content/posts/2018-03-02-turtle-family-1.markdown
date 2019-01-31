@@ -268,7 +268,7 @@ La liste des helpers de tests se trouve ici: https://github.com/thoughtbot/shoul
 Permet de générer des objets de test. La liste des objets peut être trouvé ici: https://github.com/stympy/faker
 
 Par exemple: 
-```
+```ruby
 Faker::StarWars.character
 ```
 
