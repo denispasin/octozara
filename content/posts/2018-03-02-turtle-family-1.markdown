@@ -158,7 +158,8 @@ end
 ### Le fichier .rspec
 
 Le fichier .rspec contient les options par défaut qu'on veut donner a rspec. Dans turtle_family:
-```
+
+```sh
 --require spec_helper
 --require rails_helper
 --format NyanCatFormatter
