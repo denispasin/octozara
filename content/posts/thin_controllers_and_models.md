@@ -7,6 +7,8 @@ categories: ["code"]
 
 ## Un problème de responsabilité et de régime
 
+{{< youtube PjV6inAke8k >}}
+
 Prenons une méthode de contrôleur "classique":
 
 ```ruby
