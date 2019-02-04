@@ -410,7 +410,7 @@ Ce code ci est là pour l'exemple.
 
 ### Bonus: Les transactions
 
-On pourrait laisser notre base de données gérer toute seule le rollback avec une transaction SQL:
+On pourrait laisser notre base de données gérer toute seule le rollback avec une [transaction](https://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html) SQL:
 Tout ce qui va arriver dans ce block doit bien se passer sinon revient dans l'état dans lequel tu étais avant (un peu comme une sauvegarde).
 
 Dans le cas présent ça donnerait:
