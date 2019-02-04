@@ -26,16 +26,16 @@ def update
     return redirect_to(root_path)
   end
 
-  # verifier que le current user à le droit de update et gérer le cas d'erreur
+  # vérifier que le current user a le droit de update et gérer le cas d'erreur
   if @post.author_id != current_user.id
     flash[:error] = "You aren't authorized"
     return redirect_to(root_path)
   end
-  # Sauvegarder le text actuel du post (ça va servir plus tard)
+  # Sauvegarder le texte actuel du post (ça va servir plus tard)
   current_text = @post.text
-  # update et verifier qu'on peut bien sauver et gérer les cas d'erreur
+  # update et vérifier qu'on peut bien sauver et gérer les cas d'erreur
   if @post.update(update_params)
-    # récuperer le nouveau text du post et le nickname du current user (si on a pas son nick aller le chercher dans slack)
+    # récupérer le nouveau texte du post et le nickname du current_user ; on le récupère dans slack en cas d'absence.
     slack_nick = current_user.slack_nick
     unless slack_nick
       slack_nick = $slack_client.users_info(user: current_user.slack_id)
@@ -67,20 +67,20 @@ Un lecteur avisé et assidu de mon blog (que vous êtes surement) devrait se dir
 Et il aurait raison: Ce contrôleur est incompréhensible et beaucoup trop gros.
 Croyez moi, ce genre de choses arrivent dans la vraie vie et ça peut même être bien pire…
 
-L'exercice qu'on va essayer de mener ici va être le suivant:
+L'exercice que nous allons mener à présent est le suivant :
 
 **Lui donner une cure d'amaigrissement par diverses méthodes pour le ramener a une taille raisonnable.**
 
 PS: J'entends déjà les petits malins qui me disent: “_Bah tu peux tout mettre dans les modèles_”: Non™.
-PPS: Si vous voulez jouer: Y a un bug dans la méthode si dessus ;) (C'est fun a chercher dans une méthode gigantesque hein ?)
+PPS: Si vous voulez jouer, trouvez le bug dans la méthode ci-dessus (C'est fun a chercher dans une méthode gigantesque hein ?)
 
-**DISCLAMER: Tout le monde n'architecture pas comme moi et ce post reflète mon opinion.**
+**DISCLAMER: Ce choix d'architecture est le mien et ce post reflète mon opinion.**
 
 ## Gérer ses exceptions
 
 Première technique, la gestion des exceptions:
 
-**1: Dans les contrôleurs il est possible de définir des méthodes à appeler pour rescue une exception.**
+**1: Dans les contrôleurs, il est possible de définir des méthodes à appeler pour rescue une exception.**
 
 La méthode s'appelle [rescue_from](https://api.rubyonrails.org/classes/ActiveSupport/Rescuable/ClassMethods.html)
 
@@ -95,7 +95,7 @@ rescue ActionController::ParameterMissing => e
 end
 ```
 
-Va donner:
+Qui va devenir :
 
 Dans la méthode de contrôleur:
 
@@ -135,9 +135,9 @@ De même entre `update`/`create` et `update!`/`create!` ?
 
 La réponse est assez simple, les secondes feront remonter une exception et arrêteront donc l'exécution du code en cours.
 
-**2: Pensez à utiliser la version "avec exception" des méthodes à moins que vous ayez besoin de vous fichiez de l'échec.**
+**2: Pensez à utiliser la version "avec exception" des méthodes à moins que vous n'ayez pas besoin de gérer l'échec.**
 
-On va donc utiliser ça dans notre méthode de contrôleur (couplé à la règle 1):
+Nous l'implémentons dans notre méthode de contrôleur (couplé à la règle 1) :
 
 ```ruby
 # trouver le post et gérer le cas d'erreur
@@ -211,7 +211,7 @@ end
 ### Bonus
 
 On pourrait même externaliser ces comportements de `rescue` d'exceptions dans notre `ApplicationController`.
-En effet, il y a de grande chance que la majeure partie de notre application se comporte comme ça.
+En effet, il y a de grande chances que la majeure partie de notre application se comporte comme ça.
 
 Ici on a donc:
 
@@ -254,13 +254,13 @@ class PostsController < ApplicationController
     # trouver le post
     @post = Post.find(params[:id])
 
-    # verifier que le current user à le droit de update et gérer le cas d'erreur
+    # verifier que le current user à le droit d'update et gérer le cas d'erreur
     if @post.author_id != current_user.id
       flash[:error] = "You aren't authorized"
       return redirect_to(root_path)
     end
 
-    # Sauvegarder le text actuel du post (ça va servir plus tard)
+    # Sauvegarder le texte actuel du post (ça va servir plus tard)
     current_text = @post.text
 
     # update
@@ -297,21 +297,21 @@ class PostsController < ApplicationController
 end
 ```
 
-C'est pas parfait mais c'est déjà mieux. On va maintenant attaquer le découpage avec des services (un ici).
+Ce n'est pas parfait mais c'est déjà mieux. On va maintenant attaquer le découpage avec des services (un seul ici).
 
 ## Les services
 
-Les services sont pour moi une façon de se "protéger" et rendre transparent l'appel a un service tiers (ici Slack) pour le reste de notre application.
-Ça va ici nous permettre de:
+Les services représentent pour moi une façon de se "protéger" et rendre transparent l'appel a un service tiers (ici Slack) pour le reste de notre application.
+Grâce aux services, il est possible de :
 
 - Ne pas avoir de variable globale ou autres trucs étranges;
 - Ne pas obliger le reste de notre code a savoir comment marche la gem/l'API qui cache;
 - Utiliser des valeurs/comportements par défaut (par exemple, on peut décider que par defaut `as_user` sera toujours `true`);
-- Gérer les exceptions particulières du service tiers a un seul endroit (ici on en a pas forcement besoin)
+- Gérer les exceptions particulières du service tiers a un seul endroit (non nécessaire ici)
 
 On crée donc un dossier `app/services`. Dedans on va créer un fichier ruby pour accueillir notre service slack `app/services/slack_service.rb`
 
-En général (et là c'est plus du cas par cas) on aura besoin d'initialiser nos service qu'une seule fois dans toute notre application.
+En général (et là c'est plus du cas par cas), on aura besoin d'initialiser nos service qu'une seule fois dans toute notre application.
 On peut le faire dans un `initializer` au lancement de notre application puis le stocker dans une variable globale et l'utiliser comme ça ensuite.
 Ou on peut décider de faire de notre service un [singleton](https://ruby-doc.org/stdlib-2.6/libdoc/singleton/rdoc/Singleton.html).
 Un singleton assure qu'il y aura toujours dans notre application au plus 1 instance de la classe.
@@ -441,7 +441,7 @@ class PostsController < ApplicationController
     # trouver le post
     @post = Post.find(params[:id])
 
-    # verifier que le current user à le droit de update et gérer le cas d'erreur
+    # vérifier que le current user a le droit de update et gérer le cas d'erreur
     if @post.author_id != current_user.id
       flash[:error] = "You aren't authorized"
       return redirect_to(root_path)
@@ -468,7 +468,7 @@ Pour gérer ses permissions plus facilement, on va passer par la gem [pundit](ht
 Elle nous permet d'extraire nos gestions de permissions dans des "policies".
 Je ne vais pas m'attarder sur pundit, ça fera l'objet d'un futur article.
 
-**4: Vos permissions devraient être dans des classes responsables que de ça**
+**4: Vos permissions devraient être dans des classes responsables exclusivement de cela.**
 
 En bref:
 
@@ -531,14 +531,14 @@ end
 
 ## Les commandes (interactors)
 
-Rendu là on se dit qu'on est pas si mal quand à ce régime.
+A ce stade, nous avons déjà bien avancé.
 Il reste néanmoins toute cette gestion de Slack qui parait bien complexe.
 
 Le push dans slack pourrait aller dans un `after_save` dans le model `Post` mais on se retrouverait toujours à avoir du code pas trop à sa place.
-En effet, pourquoi mon modèle devrait savoir quoi que ce soit concernant Slack ? C'est pas trop sa responsabilité.
+En effet, il n'appartient pas à mon modèle d'être responsable d'interactions avec Slack.
 
-Arrive ici la notion de "couche métier" qui se placera entre vos modèles et vos controllers pour empacketer vos règles propre à votre business.
-Vos modèles seront alors responsable de savoir comment s'interfacer avec la database.
+Arrive ici la notion de "couche métier" qui se placera entre vos modèles et vos controllers pour empaqueter les règles propres à votre business.
+Vos modèles auront comme unique responsabilité de savoir comment s'interfacer avec la database.
 Votre controller sera responsable de décrypter/vérifier les params, vérifier les permissions simples et lancer les actions.
 Votre couche intermédiaire fera le reste.
 
@@ -561,7 +561,7 @@ end
 
 Une classe avec une seule méthode publique: `call`.
 Il peut y avoir plusieurs sous fonctions `private` quand l'action en a besoin.
-Il vaut mieux néanmoins garder des actions les plus unitaires possibles (ça va permettre de les réutiliser plus tard ailleurs dans notre code un peu comme des Légo).
+Il vaut mieux néanmoins garder des actions les plus unitaires possibles (ça va permettre de les réutiliser plus tard ailleurs dans notre code un peu comme des Lego).
 
 On appelle l'action de la manière suivante n'importe où dans notre code: `NomDeLActionExplicite.call({context})`.
 Le context est un "hash" qui est passé à l'action quand on l'appelle et sera retourné par l'action.
@@ -569,7 +569,7 @@ Le context est un "hash" qui est passé à l'action quand on l'appelle et sera r
 Par exemple:
 
 ```ruby
-# Oui, cette action est pas très utile
+# Oui, cette action est globalement inutile
 class CapitalizeText
   include Interactor
 
@@ -584,7 +584,7 @@ result = CapitalizeText.call({text: "zaratan"})
 result.capitalized_text # => "Zaratan"
 ```
 
-**5: Vos règles métier n'ont rien à faire dans vos contrôleurs et vos modèles**
+**5: Vos règles métier n'ont rien à faire ni dans vos contrôleurs et ni dans vos modèles.**
 
 Ici on peut définir deux actions pour gérer slack:
 
@@ -637,9 +637,9 @@ end
 
 ## Un problème de besoin et sortie
 
-Un des gros défaut des interactors c'est qu'il n'est pas très pratique de savoir ce que chacun s'attend a recevoir dans son context ni ce qu'il va y ajouter.
+Un des gros défaut des interactors est qu'il n'est pas très facile de savoir ce que chacun s'attend à recevoir dans son context ni ce qu'il va y ajouter.
 
-Pour résoudre ce problème on peut utiliser un "contrat" dans chacun de nos interactors.
+Pour résoudre ce problème, on peut utiliser un "contrat" dans chacun de nos interactors.
 On peut le faire en définissant dans chacun un `before` et un `after` [hook](https://github.com/collectiveidea/interactor#hooks) qui vérifierait ce contrat.
 
 On peut aussi utiliser [interactor-contracts](https://github.com/michaelherold/interactor-contracts) qui est une gem qui simplifie leurs définitions.
@@ -660,7 +660,7 @@ class FetchSlackUsername
     required(:slack_nick).filled
   end
 
-  # On defini quoi faire en cas de bris de contrat.
+  # On définit les conséquences d'un contrat non respecté.
   # context.fail! va envoyer une exception.
   # Le comportement de base des interactor est de cacher cette exception et de juste marquer le context final comme "failed".
   on_breach do |breaches|
@@ -686,10 +686,10 @@ class SendPostEditSlackMessage
   expects do
     required(:slack_nick).filled
     required(:post).filled
-  end
+    end
 
   assures do
-    # Je laisse souvent ce block même vide comme ça je sais que ça ne va rien ajouter.
+    # Je laisse souvent ce block même vide comme ça je sais que rien ne sera ajouté.
   end
 
   on_breach do |breaches|
@@ -702,7 +702,7 @@ class SendPostEditSlackMessage
 end
 ```
 
-Comme dit en commentaire les interactors cachent les exceptions qui arrive quand on fail cf [doc](https://github.com/collectiveidea/interactor#dealing-with-failure)
+Comme précisé en commentaire les interactors cachent les exceptions soulevées en cas de fail cf [doc](https://github.com/collectiveidea/interactor#dealing-with-failure)
 
 Néanmoins, il possible de laisser cette exception arriver en faisant: `.call!` à la place de `.call` — Ça devrait vous rapeller quelque chose ;).
 
@@ -726,7 +726,7 @@ class PostsController < ApplicationController
 end
 ```
 
-Dans le cas d'un bris de contrat une exception va donc arriver. On va faire en sorte de gérer cette exception.
+En cas de rupture du contrat, une exception va donc arriver. On va faire en sorte de gérer cette exception.
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -745,11 +745,11 @@ end
 
 ### Bonus: Y a du code dupliqué. On peut DRY ça.
 
-On va définir une classe parente aux interactors qu'on a défini qui va définir un comportement par défaut:
+Définissons une classe parente aux interactors pour obtenir un comportement par défaut:
 
 ```ruby
 class ApplicationInteractor
-  # Cette sorcelerie est là pour faire comme si on avait écrit ça directement dans la classe fille.
+  # Cette sorcellerie est là pour faire comme si on avait écrit ça directement dans la classe fille.
   def self.inherited(base)
     base.instance_exec do
       include Interactor
@@ -804,14 +804,14 @@ end
 
 ## Les chaînes (organizers)
 
-On se retrouve quand même a transférer un context d'un interactor à un autre. Ce n'est pas très pratique.
+On se retrouve quand même a transférer un contexte d'un interactor à un autre. Ce n'est pas très pratique.
 
-Pour s'aider à résoudre ce genre de cas, on va utiliser les [organizers](https://github.com/collectiveidea/interactor#organizers).
-Ce sont une suite d'interactor qui transfère automatiquement le context d'un interactor de la chaine au suivant.
+Pour simplifier la gestion de ces cas, on va utiliser les [organizers](https://github.com/collectiveidea/interactor#organizers).
+Les organizers consistent en une succession d'interactors qui transfèrent automatiquement le contexte d'un interactor de la chaine au suivant.
 
 **7: Orchestrez vos commandes avec des organizers pour faire des chaines métier**
 
-On va retravailler ce bout là du controller:
+On va retravailler cette partie du controller:
 
 ```ruby
 @post.transaction do
@@ -822,7 +822,7 @@ On va retravailler ce bout là du controller:
 end
 ```
 
-On défini un nouvel Interactor pour l'update:
+On définit un nouvel Interactor pour l'update:
 
 ```ruby
 class UpdatePost < ApplicationInteractor
@@ -898,14 +898,14 @@ Maintenant que tout est découpé en petit bout, tout est beaucoup plus facile �
 
 Les 8 commandements:
 
-- **1: Dans les contrôleurs il est possible de définir des méthodes à appeler pour rescue une exception.**
-- **2: Pensez à utiliser la version "avec exception" des méthodes à moins que vous ayez besoin de vous fichiez de l'échec.**
-- **3: Protégez vous des services externes en les englobant dans des Services**
-- **4: Vos permissions devraient être dans des classes responsables que de ça**
-- **5: Vos règles métier n'ont rien à faire dans vos contrôleurs et vos modèles**
-- **6: Définissez clairement ce qu'attend et ce que va faire chaque interactor.**
-- **7: Orchestrez vos commandes avec des organizers pour faire des chaines métier**
-- **8: Si c'est pas/difficilement testable ça sent pas bon.**
+- **1: Dans les contrôleurs, il est possible de définir des méthodes à appeler pour rescue une exception;**
+- **2: Pensez à utiliser la version "avec exception" des méthodes à moins que vous n'ayez pas besoin de gérer les échecs;**
+- **3: Protégez vous des services externes en les englobant dans des Services;**
+- **4: Vos permissions devraient être dans des classes responsables uniquement de leur gestion;**
+- **5: Vos règles métier n'ont rien à faire ni dans vos contrôleurs et ni dans vos modèles;**
+- **6: Définissez clairement ce qu'attend et ce que va faire chaque interactor;**
+- **7: Orchestrez vos commandes avec des organizers pour faire des chaines métier;**
+- **8: Si c'est pas/difficilement testable, ça sent pas bon.**
 
 On a vu ce a quoi pouvaient servir les interactors et les différentes techniques pour réduire la taille et DRY ses méthodes de controller.
 Toutes ces techniques ne sont pas obligatoires mais ça devrait vous aider quand ça devient trop long ou trop complexe.
