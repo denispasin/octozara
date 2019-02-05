@@ -9,7 +9,7 @@ categories: ["code"]
 
 {{< youtube PjV6inAke8k >}}
 
-Prenons une méthode de contrôleur "classique":
+Prenons une méthode de contrôleur "classique" :
 
 ```ruby
 def update
@@ -65,28 +65,28 @@ def update
 end
 ```
 
-Un lecteur avisé et assidu de mon blog (que vous êtes surement) devrait se dire: “_Mon dieu… brulez ça_”.
-Et il aurait raison: Ce contrôleur est incompréhensible et beaucoup trop gros.
-Croyez moi, ce genre de choses arrivent dans la vraie vie et ça peut même être bien pire…
+Un lecteur avisé et assidu de mon blog (que vous êtes sûrement) devrait se dire : “_Mon dieu… brulez ça_”.
+Et il aurait raison : Ce contrôleur est incompréhensible et beaucoup trop gros.
+Croyez-moi, ce genre de choses arrivent dans la vraie vie et ça peut même être bien pire…
 
 L'exercice que nous allons mener à présent est le suivant :
 
-**Lui donner une cure d'amaigrissement par diverses méthodes pour le ramener a une taille raisonnable.**
+**Lui donner une cure d'amaigrissement par diverses méthodes pour le ramener à une taille raisonnable.**
 
-PS: J'entends déjà les petits malins qui me disent: “_Bah tu peux tout mettre dans les modèles_”: Non™.
-PPS: Si vous voulez jouer, trouvez le bug dans la méthode ci-dessus (C'est fun a chercher dans une méthode gigantesque hein ?)
+PS: J'entends déjà les petits malins qui me disent: “_Bah tu peux tout mettre dans les modèles_” : Non™.
+PPS: Si vous voulez jouer, trouvez le bug dans la méthode ci-dessus (C'est fun à chercher dans une méthode gigantesque, hein ?)
 
 **DISCLAMER: Ce choix d'architecture est le mien et ce post reflète mon opinion.**
 
 ## Gérer ses exceptions
 
-Première technique, la gestion des exceptions:
+Première technique, la gestion des exceptions :
 
 **1: Dans les contrôleurs, il est possible de définir des méthodes à appeler pour rescue une exception.**
 
 La méthode s'appelle [rescue_from](https://api.rubyonrails.org/classes/ActiveSupport/Rescuable/ClassMethods.html)
 
-On va donc retravailler ce "magnifique"
+On va donc retravailler ce "magnifique" :
 
 ```ruby
 begin
@@ -97,15 +97,13 @@ rescue ActionController::ParameterMissing => e
 end
 ```
 
-Qui va devenir :
-
-Dans la méthode de contrôleur:
+Qui va devenir, dans la méthode de contrôleur :
 
 ```ruby
 # rien
 ```
 
-en dehors de la méthode mais dans le contrôleur:
+Et en dehors de la méthode mais dans le contrôleur :
 
 ```ruby
 class PostsController < ApplicationController
@@ -121,7 +119,7 @@ class PostsController < ApplicationController
   end
 
   # le `@update_params ||=` est une technique pour ne pas réexecuter
-  # le second bout de la méthode a chaque fois.
+  # le second bout de la méthode à chaque fois.
   # Il sera calculé la première fois (car @update_params sera nil),
   # puis plus jamais (car @update_params vaudra la bonne valeur).
   def update_params
@@ -130,14 +128,14 @@ class PostsController < ApplicationController
 end
 ```
 
-## Les méthodes "exceptionnelles" de ActiveRecord
+## Les méthodes "exceptionnelles" d'ActiveRecord
 
-Savez vous quelle est la différence entre `find_by(id: xxx)` et `find(xxx)` ou `find_by!(id: xxx)` ?
+Savez-vous quelle est la différence entre `find_by(id: xxx)` et `find(xxx)` ou `find_by!(id: xxx)` ?
 De même entre `update`/`create` et `update!`/`create!` ?
 
-La réponse est assez simple, les secondes feront remonter une exception et arrêteront donc l'exécution du code en cours.
+La réponse est assez simple, les version avec "!" ainsi que la méthode find() feront remonter une exception et arrêteront ainsi l'exécution du code en cours.
 
-**2: Pensez à utiliser la version "avec exception" des méthodes à moins que vous n'ayez pas besoin de gérer l'échec.**
+**2: Pensez à utiliser la version "avec exception" des méthodes, à moins que vous n'ayez pas besoin de gérer l'échec.**
 
 Nous l'implémentons dans notre méthode de contrôleur (couplé à la règle 1) :
 
@@ -150,7 +148,7 @@ unless @post
 end
 ```
 
-devient
+devient :
 
 ```ruby
 class PostsController < ApplicationController
@@ -176,7 +174,7 @@ class PostsController < ApplicationController
 end
 ```
 
-De même
+De même :
 
 ```ruby
 if @post.update(update_params)
@@ -187,7 +185,7 @@ else
 end
 ```
 
-devient
+devient :
 
 ```ruby
 class PostsController < ApplicationController
@@ -213,9 +211,9 @@ end
 ### Bonus
 
 On pourrait même externaliser ces comportements de `rescue` d'exceptions dans notre `ApplicationController`.
-En effet, il y a de grande chances que la majeure partie de notre application se comporte comme ça.
+En effet, il y a de grande chances que la majeure partie de notre application se comporte de cette façon.
 
-Ici on a donc:
+Ici, on a donc :
 
 {{< filename "app/controllers/application_controller.rb" >}}
 
@@ -246,7 +244,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-et
+et :
 
 {{< filename "app/controllers/posts_controller.rb"  >}}
 
@@ -299,24 +297,24 @@ class PostsController < ApplicationController
 end
 ```
 
-Ce n'est pas parfait mais c'est déjà mieux. On va maintenant attaquer le découpage avec des services (un seul ici).
+Ce n'est pas parfait, mais c'est déjà mieux. On va maintenant attaquer le découpage avec des services (un seul, ici).
 
 ## Les services
 
-Les services représentent pour moi une façon de se "protéger" et rendre transparent l'appel a un service tiers (ici Slack) pour le reste de notre application.
+Les services représentent pour moi une façon de se "protéger" et de rendre transparent l'appel à un service tiers (ici Slack) pour le reste de notre application.
 Grâce aux services, il est possible de :
 
 - Ne pas avoir de variable globale ou autres trucs étranges;
-- Ne pas obliger le reste de notre code a savoir comment marche la gem/l'API qui cache;
-- Utiliser des valeurs/comportements par défaut (par exemple, on peut décider que par defaut `as_user` sera toujours `true`);
-- Gérer les exceptions particulières du service tiers a un seul endroit (non nécessaire ici)
+- Ne pas obliger le reste de notre code à savoir comment marche la gem/l'API qu'ils cachent;
+- Utiliser des valeurs/comportements par défaut (par exemple, on peut décider que, par defaut, `as_user` sera toujours `true`);
+- Gérer les exceptions particulières du service tiers à un seul endroit (non nécessaire ici)
 
 On crée donc un dossier `app/services`. Dedans on va créer un fichier ruby pour accueillir notre service slack `app/services/slack_service.rb`
 
-En général (et là c'est plus du cas par cas), on aura besoin d'initialiser nos service qu'une seule fois dans toute notre application.
-On peut le faire dans un `initializer` au lancement de notre application puis le stocker dans une variable globale et l'utiliser comme ça ensuite.
+En général (et là c'est plus du cas par cas), on n'aura besoin d'initialiser nos services qu'une seule fois dans toute notre application.
+On peut le faire dans un `initializer` au lancement de notre application, puis le stocker dans une variable globale et l'utiliser comme ça ensuite.
 Ou on peut décider de faire de notre service un [singleton](https://ruby-doc.org/stdlib-2.6/libdoc/singleton/rdoc/Singleton.html).
-Un singleton assure qu'il y aura toujours dans notre application au plus 1 instance de la classe.
+Un singleton assure qu'il y aura toujours dans notre application 1 instance au plus de la classe.
 
 **3: Protégez vous des services externes en les englobant dans des Services**
 
@@ -340,7 +338,7 @@ end
 
 On pourra ensuite y accéder de la façon suivante: `SlackService.instance` (le `initialize` ne sera appelé que la première fois).
 
-On va maintenant extraire du contrôleur les différentes méthodes qui faisaient appel a Slack (et se rendre compte qu'il y avait un bug)
+On va maintenant extraire du contrôleur les différentes méthodes qui faisaient appel à Slack (et se rendre compte qu'il y avait un bug) :
 
 ```ruby
 class SlackService
@@ -348,8 +346,8 @@ class SlackService
   […]
 
   def fetch_username_from_id(id)
-    # Le bug était ici, on ne récupère pas vraiment le username mais un objet entier
-    # C'est facile de le voir maintenant qu'on a presque plus rien dans la méthode ;)
+    # Le bug était ici, on ne récupère pas vraiment le username mais un objet entier.
+    # C'est facile de le voir maintenant qu'on n'a presque plus rien dans la méthode ;)
     json = @client.users_info(user: id)
     if json.ok
       json.user.name
@@ -368,7 +366,7 @@ class SlackService
 end
 ```
 
-Ce qui donnera dans notre controller
+Ce qui donnera dans notre controller :
 
 ```ruby
 class PostsController < ApplicationController
@@ -404,8 +402,8 @@ class PostsController < ApplicationController
 end
 ```
 
-Discutons un peu de la décision de rollback dans le cas d'une erreur.
-À mon avis dans un cas comme ça, si Slack décide de ne pas marche on ne devrait pas rollback.
+Discutons un peu de la décision de rollback en cas d'erreur.
+À mon avis, dans un cas comme ça, si Slack décide de ne pas marcher, on ne devrait pas rollback.
 Ce code ci est là pour l'exemple.
 
 ### Bonus: Les transactions
@@ -413,7 +411,7 @@ Ce code ci est là pour l'exemple.
 On pourrait laisser notre base de données gérer toute seule le rollback avec une [transaction](https://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html) SQL:
 Tout ce qui va arriver dans ce block doit bien se passer sinon revient dans l'état dans lequel tu étais avant (un peu comme une sauvegarde).
 
-Dans le cas présent ça donnerait:
+Dans le cas présent, ça donnerait :
 
 {{< filename "app/controllers/application_controller.rb" >}}
 
@@ -467,12 +465,12 @@ end
 ## La gestion des permissions
 
 Pour gérer ses permissions plus facilement, on va passer par la gem [pundit](https://github.com/varvet/pundit).
-Elle nous permet d'extraire nos gestions de permissions dans des "policies".
+Elle nous permet d'extraire nos gestions de permissions dans des "policies". 
 Je ne vais pas m'attarder sur pundit, ça fera l'objet d'un futur article.
 
 **4: Vos permissions devraient être dans des classes responsables exclusivement de cela.**
 
-En bref:
+En bref :
 
 {{< filename "app/policies/post_policy.rb">}}
 
@@ -514,15 +512,15 @@ class PostsController < ApplicationController
     # verifier que le current user à le droit de update
     authorize @post
 
-    # Si la moindre exception arrive là dedans, revient en arrière.
+    # Si la moindre exception arrive là dedans, ça revient en arrière.
     @post.transaction do
       @post.update!(update_params)
 
       slack_nick = current_user.slack_nick
       unless slack_nick
         slack_nick = SlackService.instance.fetch_username_from_id(current_user.slack_id)
-        # On remarquera qu'on avait jamais check si le user pouvait effectivement s'update…
-        # Encore un bug qu'on peut maintenant voir parceque c'est petit.
+        # On remarquera qu'on n'avait jamais vérifé si le user pouvait effectivement s'update…
+        # Encore un bug qu'on peut maintenant voir parce que c'est petit.
         current_user.update!(slack_nick)
       end
       SlackService.instance.post_message("@#{slack_nick} haz updated the post##{@post.id} with: #{update_params.text}")
@@ -536,7 +534,7 @@ end
 A ce stade, nous avons déjà bien avancé.
 Il reste néanmoins toute cette gestion de Slack qui parait bien complexe.
 
-Le push dans slack pourrait aller dans un `after_save` dans le model `Post` mais on se retrouverait toujours à avoir du code pas trop à sa place.
+Le push dans slack pourrait aller dans un `after_save` dans le model `Post`, mais on se retrouverait toujours à avoir du code pas vraiment à sa place.
 En effet, il n'appartient pas à mon modèle d'être responsable d'interactions avec Slack.
 
 Arrive ici la notion de "couche métier" qui se placera entre vos modèles et vos controllers pour empaqueter les règles propres à votre business.
@@ -544,10 +542,9 @@ Vos modèles auront comme unique responsabilité de savoir comment s'interfacer 
 Votre controller sera responsable de décrypter/vérifier les params, vérifier les permissions simples et lancer les actions.
 Votre couche intermédiaire fera le reste.
 
-Pour ce faire, j'aime beaucoup utiliser la gem [interactor](https://github.com/collectiveidea/interactor).
-Qui n'est à mon sens qu'un wrapper pratique autour du design pattern [Command](<https://fr.wikipedia.org/wiki/Commande_(patron_de_conception)>).
+Pour ce faire, j'aime beaucoup utiliser la gem [interactor](https://github.com/collectiveidea/interactor), qui n'est à mon sens qu'un wrapper pratique autour du design pattern [Command](<https://fr.wikipedia.org/wiki/Commande_(patron_de_conception)>).
 
-L'idée de ce pattern est de dire: “_Il permet de séparer complètement le code initiateur de l'action, du code de l'action elle-même._”
+L'idée de ce pattern est de dire : “_Il permet de séparer complètement le code initiateur de l'action, du code de l'action elle-même._”
 
 Un interactor ressemble à ceci:
 
@@ -565,8 +562,8 @@ Une classe avec une seule méthode publique: `call`.
 Il peut y avoir plusieurs sous fonctions `private` quand l'action en a besoin.
 Il vaut mieux néanmoins garder des actions les plus unitaires possibles (ça va permettre de les réutiliser plus tard ailleurs dans notre code un peu comme des Lego).
 
-On appelle l'action de la manière suivante n'importe où dans notre code: `NomDeLActionExplicite.call({context})`.
-Le context est un "hash" qui est passé à l'action quand on l'appelle et sera retourné par l'action.
+On appelle l'action de la manière suivante, n'importe où dans notre code : `NomDeLActionExplicite.call({context})`.
+Le context est un "hash" qui passe à l'action quand on l'appelle, et qui sera retourné par l'action.
 
 Par exemple:
 
@@ -586,9 +583,9 @@ result = CapitalizeText.call({text: "zaratan"})
 result.capitalized_text # => "Zaratan"
 ```
 
-**5: Vos règles métier n'ont rien à faire ni dans vos contrôleurs et ni dans vos modèles.**
+**5: Vos règles métier n'ont rien à faire ni dans vos contrôleurs, ni dans vos modèles.**
 
-Ici on peut définir deux actions pour gérer slack:
+Ici on peut définir deux actions pour gérer slack :
 
 ```ruby
 class FetchSlackUsername
@@ -615,7 +612,7 @@ class SendPostEditSlackMessage
 end
 ```
 
-Pour ensuite change notre controller en:
+Pour ensuite changer notre controller en :
 
 ```ruby
 class PostsController < ApplicationController
@@ -637,9 +634,9 @@ class PostsController < ApplicationController
 end
 ```
 
-## Un problème de besoin et sortie
+## Un problème de besoin et de sortie
 
-Un des gros défaut des interactors est qu'il n'est pas très facile de savoir ce que chacun s'attend à recevoir dans son context ni ce qu'il va y ajouter.
+Un des gros défauts des interactors est qu'il n'est pas très facile de savoir ce que chacun s'attend à recevoir dans son context ni ce qu'il va y ajouter.
 
 Pour résoudre ce problème, on peut utiliser un "contrat" dans chacun de nos interactors.
 On peut le faire en définissant dans chacun un `before` et un `after` [hook](https://github.com/collectiveidea/interactor#hooks) qui vérifierait ce contrat.
@@ -664,7 +661,7 @@ class FetchSlackUsername
 
   # On définit les conséquences d'un contrat non respecté.
   # context.fail! va envoyer une exception.
-  # Le comportement de base des interactor est de cacher cette exception et de juste marquer le context final comme "failed".
+  # Le comportement de base des interactors est de cacher cette exception et de seulement marquer le context final comme "failed".
   on_breach do |breaches|
     context.fail!(errors: breaches.flat_map(&:messages), breaches: breaches.flat_map(&:property))
   end
@@ -691,7 +688,7 @@ class SendPostEditSlackMessage
     end
 
   assures do
-    # Je laisse souvent ce block même vide comme ça je sais que rien ne sera ajouté.
+    # Je laisse souvent ce block vide, comme ça je sais que rien ne sera ajouté.
   end
 
   on_breach do |breaches|
@@ -704,9 +701,9 @@ class SendPostEditSlackMessage
 end
 ```
 
-Comme précisé en commentaire les interactors cachent les exceptions soulevées en cas de fail cf [doc](https://github.com/collectiveidea/interactor#dealing-with-failure)
+Comme précisé en commentaire, les interactors cachent les exceptions soulevées en cas de fail (cf [doc]).(https://github.com/collectiveidea/interactor#dealing-with-failure)
 
-Néanmoins, il possible de laisser cette exception arriver en faisant: `.call!` à la place de `.call` — Ça devrait vous rapeller quelque chose ;).
+Néanmoins, il est possible de laisser cette exception arriver en faisant : `.call!` à la place de `.call` — Ça devrait vous rapeller quelque chose ;).
 
 ```ruby
 class PostsController < ApplicationController
@@ -745,9 +742,9 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-### Bonus: Y a du code dupliqué. On peut DRY ça.
+### Bonus: Il y a du code dupliqué. On peut DRY ça.
 
-Définissons une classe parente aux interactors pour obtenir un comportement par défaut:
+Définissons une classe parente aux interactors pour obtenir un comportement par défaut :
 
 ```ruby
 class ApplicationInteractor
@@ -765,7 +762,7 @@ class ApplicationInteractor
 end
 ```
 
-On a donc:
+On a donc :
 
 ```ruby
 class FetchSlackUsername < ApplicationInteractor
@@ -806,14 +803,14 @@ end
 
 ## Les chaînes (organizers)
 
-On se retrouve quand même a transférer un contexte d'un interactor à un autre. Ce n'est pas très pratique.
+On se retrouve quand même à transférer un contexte d'un interactor à un autre. Ce n'est pas très pratique.
 
-Pour simplifier la gestion de ces cas, on va utiliser les [organizers](https://github.com/collectiveidea/interactor#organizers).
+Pour simplifier la gestion de ces cas-là, on va utiliser les [organizers](https://github.com/collectiveidea/interactor#organizers).
 Les organizers consistent en une succession d'interactors qui transfèrent automatiquement le contexte d'un interactor de la chaine au suivant.
 
 **7: Orchestrez vos commandes avec des organizers pour faire des chaines métier**
 
-On va retravailler cette partie du controller:
+On va retravailler cette partie du controller :
 
 ```ruby
 @post.transaction do
@@ -824,7 +821,7 @@ On va retravailler cette partie du controller:
 end
 ```
 
-On définit un nouvel Interactor pour l'update:
+On définit un nouvel Interactor pour l'update :
 
 ```ruby
 class UpdatePost < ApplicationInteractor
@@ -842,11 +839,11 @@ class UpdatePost < ApplicationInteractor
 end
 ```
 
-Puis on défini un organizer pour faire tout ça:
+Puis on définit un organizer pour faire tout ça :
 
 ```ruby
 class UpdatePostAndPostsToSlack
-  # Je met le code ici mais en vrai ça devrait être dans un ApplicationOrganizer ;)
+  # Je mets le code ici, mais en vrai ça devrait être dans un ApplicationOrganizer ;)
   include Interactor::Organizer
   include Interactor::Contracts
   on_breach do |breaches|
@@ -863,7 +860,7 @@ class UpdatePostAndPostsToSlack
   end
 
   around do |interactors|
-    # Si la moindre exception arrive là dedans, revient en arrière.
+    # Si la moindre exception arrive là dedans, ça revient en arrière.
     context.post.transaction do
       interactors.call
     end
@@ -873,7 +870,7 @@ class UpdatePostAndPostsToSlack
 end
 ```
 
-Et **enfin** notre controller:
+Et **enfin** notre controller :
 
 ```ruby
 class PostsController < ApplicationController
@@ -881,7 +878,7 @@ class PostsController < ApplicationController
     # Trouver le post
     @post = Post.find(params[:id])
 
-    # Verifier que le current user à le droit de update
+    # Verifier que le current user a le droit de update
     authorize @post
 
     # Action !
@@ -892,20 +889,20 @@ end
 
 ## Et les tests dans tout ça ?
 
-Maintenant que tout est découpé en petit bout, tout est beaucoup plus facile à tester. Chaque Interactor, Organizer, Service, Policy pouvant être testé séparément :)
+Maintenant que tout est découpé en petits bouts, tout est beaucoup plus facile à tester. Chaque Interactor, Organizer, Service, Policy pouvant être testé séparément :)
 
-**8: Si c'est pas/difficilement testable ça sent pas bon.**
+**8: Si c'est pas/difficilement testable, ça sent pas bon.**
 
 ## Conclusion
 
-Les 8 commandements:
+Les 8 commandements :
 
 - **1: Dans les contrôleurs, il est possible de définir des méthodes à appeler pour rescue une exception;**
 - **2: Pensez à utiliser la version "avec exception" des méthodes à moins que vous n'ayez pas besoin de gérer les échecs;**
-- **3: Protégez vous des services externes en les englobant dans des Services;**
+- **3: Protégez-vous des services externes en les englobant dans des Services;**
 - **4: Vos permissions devraient être dans des classes responsables uniquement de leur gestion;**
-- **5: Vos règles métier n'ont rien à faire ni dans vos contrôleurs et ni dans vos modèles;**
-- **6: Définissez clairement ce qu'attend et ce que va faire chaque interactor;**
+- **5: Vos règles métier n'ont rien à faire ni dans vos contrôleurs, ni dans vos modèles;**
+- **6: Définissez clairement ce qu'attend et va faire chaque interactor;**
 - **7: Orchestrez vos commandes avec des organizers pour faire des chaines métier;**
 - **8: Si c'est pas/difficilement testable, ça sent pas bon.**
 
