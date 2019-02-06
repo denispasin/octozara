@@ -13,7 +13,7 @@ Prenons une méthode de contrôleur "classique" :
 
 ```ruby
 def update
-  # récuperer les paramètres (strong params) (et gérer les erreurs)
+  # Récuperer les paramètres (strong params) (et gérer les erreurs)
   begin
     update_params = params.require(:post).permit(:text)
   rescue ActionController::ParameterMissing => e
@@ -21,23 +21,23 @@ def update
     return redirect_to(root_path)
   end
 
-  # trouver le post et gérer le cas d'erreur
+  # Trouver le post et gérer le cas d'erreur
   @post = Post.find_by(id: params[:id])
   unless @post
     flash[:error] = "Post not found"
     return redirect_to(root_path)
   end
 
-  # vérifier que le current user a le droit de update et gérer le cas d'erreur
+  # Vérifier que le current user a le droit de update et gérer le cas d'erreur
   if @post.author_id != current_user.id
     flash[:error] = "You aren't authorized"
     return redirect_to(root_path)
   end
   # Sauvegarder le texte actuel du post (ça va servir plus tard)
   current_text = @post.text
-  # update et vérifier qu'on peut bien sauver et gérer les cas d'erreur
+  # Update et vérifier qu'on peut bien sauver et gérer les cas d'erreur
   if @post.update(update_params)
-    # récupérer le nouveau texte du post et le nickname du current_user ; on le récupère dans slack en cas d'absence.
+    # Récupérer le nouveau texte du post et le nickname du current_user ; on le récupère dans slack en cas d'absence.
     slack_nick = current_user.slack_nick
     unless slack_nick
       slack_nick = $slack_client.users_info(user: current_user.slack_id)
@@ -52,7 +52,7 @@ def update
       return redirect_to(root_path)
     end
     text = update_params.text
-    # envoyer le message slack pour annoncer l'update
+    # Envoyer le message slack pour annoncer l'update
     $slack_client.chat_postMessage(
       channel: '#general',
       text: "@#{slack_nick} haz updated the post##{@post.id} with: #{text}",
@@ -73,7 +73,7 @@ L'exercice que nous allons mener à présent est le suivant :
 
 **Lui donner une cure d'amaigrissement par diverses méthodes pour le ramener à une taille raisonnable.**
 
-PS: J'entends déjà les petits malins qui me disent: “_Bah tu peux tout mettre dans les modèles_” : Non™.
+PS: J'entends déjà les petits malins qui me disent: “_Bah tu peux tout mettre dans les modèles_” : Non™.  
 PPS: Si vous voulez jouer, trouvez le bug dans la méthode ci-dessus (C'est fun à chercher dans une méthode gigantesque, hein ?)
 
 **DISCLAMER: Ce choix d'architecture est le mien et ce post reflète mon opinion.**
@@ -112,16 +112,16 @@ class PostsController < ApplicationController
   […]
   private
 
-  # On remarque qu'on a plus besoin de return
+  # On remarque qu'on n'a plus besoin du return
   def bad_parameters(exception)
     flash[:error] = e.message
     redirect_to(root_path)
   end
 
-  # le `@update_params ||=` est une technique pour ne pas réexecuter
+  # Le `@update_params ||=` est une technique pour ne pas réexecuter
   # le second bout de la méthode à chaque fois.
-  # Il sera calculé la première fois (car @update_params sera nil),
-  # puis plus jamais (car @update_params vaudra la bonne valeur).
+  # Il sera calculé la première fois (car @update_params vaudra nil),
+  # mais pas les suivantes (car @update_params vaudra alors la bonne valeur).
   def update_params
     @update_params ||= params.require(:post).permit(:text)
   end
@@ -133,14 +133,14 @@ end
 Savez-vous quelle est la différence entre `find_by(id: xxx)` et `find(xxx)` ou `find_by!(id: xxx)` ?
 De même entre `update`/`create` et `update!`/`create!` ?
 
-La réponse est assez simple, les version avec "!" ainsi que la méthode find() feront remonter une exception et arrêteront ainsi l'exécution du code en cours.
+La réponse est assez simple, les versions avec "!", ainsi que la méthode find(), feront remonter une exception et arrêteront ainsi l'exécution du code en cours.
 
 **2: Pensez à utiliser la version "avec exception" des méthodes, à moins que vous n'ayez pas besoin de gérer l'échec.**
 
 Nous l'implémentons dans notre méthode de contrôleur (couplé à la règle 1) :
 
 ```ruby
-# trouver le post et gérer le cas d'erreur
+# Trouver le post et gérer le cas d'erreur
 @post = Post.find_by(id: params[:id])
 unless @post
   flash[:error] = "Post not found"
@@ -164,7 +164,7 @@ class PostsController < ApplicationController
   private
   […]
 
-  # Encore une fois pas de return
+  # Encore une fois, plus besoin du return
   def record_not_found
     flash[:error] = "Post not found"
     redirect_to(root_path)
@@ -210,7 +210,7 @@ end
 
 ### Bonus
 
-On pourrait même externaliser ces comportements de `rescue` d'exceptions dans notre `ApplicationController`.
+On pourrait même externaliser le comportement de ces `rescue`s d'exceptions dans notre `ApplicationController`.  
 En effet, il y a de grande chances que la majeure partie de notre application se comporte de cette façon.
 
 Ici, on a donc :
@@ -251,10 +251,10 @@ et :
 ```ruby
 class PostsController < ApplicationController
   def update
-    # trouver le post
+    # Trouver le post
     @post = Post.find(params[:id])
 
-    # verifier que le current user à le droit d'update et gérer le cas d'erreur
+    # Vérifier que le current user a le droit d'update et gérer le cas d'erreur
     if @post.author_id != current_user.id
       flash[:error] = "You aren't authorized"
       return redirect_to(root_path)
@@ -263,10 +263,10 @@ class PostsController < ApplicationController
     # Sauvegarder le texte actuel du post (ça va servir plus tard)
     current_text = @post.text
 
-    # update
+    # Update
     @post.update!(update_params)
 
-    # récuperer le nouveau text du post et le nickname du current user (si on a pas son nick aller le chercher dans slack)
+    # Récuperer le nouveau text du post et le nickname du current user (si on a pas son nick aller le chercher dans slack)
     slack_nick = current_user.slack_nick
     unless slack_nick
       slack_nick = $slack_client.users_info(user: current_user.slack_id)
@@ -281,7 +281,7 @@ class PostsController < ApplicationController
       return redirect_to(root_path)
     end
     text = update_params.text
-    # envoyer le message slack pour annoncer l'update
+    # Envoyer le message slack pour annoncer l'update
     $slack_client.chat_postMessage(
       channel: '#general',
       text: "@#{slack_nick} haz updated the post##{@post.id} with: #{text}",
@@ -309,12 +309,12 @@ Grâce aux services, il est possible de :
 - Utiliser des valeurs/comportements par défaut (par exemple, on peut décider que, par defaut, `as_user` sera toujours `true`);
 - Gérer les exceptions particulières du service tiers à un seul endroit (non nécessaire ici)
 
-On crée donc un dossier `app/services`. Dedans on va créer un fichier ruby pour accueillir notre service slack `app/services/slack_service.rb`
+On crée donc un dossier `app/services` dans lequel on va créer un fichier ruby `app/services/slack_service.rb` pour accueillir notre service slack 
 
 En général (et là c'est plus du cas par cas), on n'aura besoin d'initialiser nos services qu'une seule fois dans toute notre application.
 On peut le faire dans un `initializer` au lancement de notre application, puis le stocker dans une variable globale et l'utiliser comme ça ensuite.
 Ou on peut décider de faire de notre service un [singleton](https://ruby-doc.org/stdlib-2.6/libdoc/singleton/rdoc/Singleton.html).
-Un singleton assure qu'il y aura toujours dans notre application 1 instance au plus de la classe.
+Un singleton assure qu'il n'y aura toujours qu'une seule instance d'une classe donnée dans notre application. 
 
 **3: Protégez vous des services externes en les englobant dans des Services**
 
@@ -336,7 +336,7 @@ class SlackService
 end
 ```
 
-On pourra ensuite y accéder de la façon suivante: `SlackService.instance` (le `initialize` ne sera appelé que la première fois).
+On pourra ensuite y accéder de la façon suivante : `SlackService.instance`. La méthode `initialize` ne sera appelée que la première fois.
 
 On va maintenant extraire du contrôleur les différentes méthodes qui faisaient appel à Slack (et se rendre compte qu'il y avait un bug) :
 
@@ -375,7 +375,7 @@ class PostsController < ApplicationController
   def update
     […]
 
-    # On va passer a une variable d'instance
+    # On passe à une variable d'instance
     @current_text = @post.text
 
     […]
@@ -385,7 +385,7 @@ class PostsController < ApplicationController
       slack_nick = SlackService.instance.fetch_username_from_id(current_user.slack_id)
       current_user.update(slack_nick)
     end
-    # envoyer le message slack pour annoncer l'update
+    # Envoyer le message slack pour annoncer l'update
     SlackService.instance.post_message("@#{slack_nick} haz updated the post##{@post.id} with: #{update_params.text}")
   end
 
@@ -408,8 +408,8 @@ Ce code ci est là pour l'exemple.
 
 ### Bonus: Les transactions
 
-On pourrait laisser notre base de données gérer toute seule le rollback avec une [transaction](https://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html) SQL:
-Tout ce qui va arriver dans ce block doit bien se passer sinon revient dans l'état dans lequel tu étais avant (un peu comme une sauvegarde).
+On peut laisser notre base de données gérer toute seule le rollback avec une [transaction](https://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html) SQL :
+Tout ce qui arrivera dans ce block doit bien se passer. Dans le cas contraire, la bdd reviendra dans l'état dans lequel elle était avant la transaction (un peu comme une sauvegarde).
 
 Dans le cas présent, ça donnerait :
 
@@ -423,7 +423,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # Maintenant que cette action est plus générale, on peut l'envoyer dans l'ApplicationController
+  # Maintenant que cette action est plus générale, on peut l'envoyer dans le fichier ApplicationController
   def slack_error(e)
     flash[:error] = "Something went wrong in slack O_o"
     redirect_to(root_path)
@@ -438,16 +438,16 @@ end
 ```ruby
 class PostsController < ApplicationController
   def update
-    # trouver le post
+    # Trouver le post
     @post = Post.find(params[:id])
 
-    # vérifier que le current user a le droit de update et gérer le cas d'erreur
+    # Vérifier que le current user a le droit d'update et gérer le cas d'erreur
     if @post.author_id != current_user.id
       flash[:error] = "You aren't authorized"
       return redirect_to(root_path)
     end
 
-    # Si la moindre exception arrive là dedans, revient en arrière.
+    # Si la moindre exception arrive dans le bloc de la transaction, on revient en arrière.
     @post.transaction do
       @post.update!(update_params)
 
@@ -465,10 +465,10 @@ end
 ## La gestion des permissions
 
 Pour gérer ses permissions plus facilement, on va passer par la gem [pundit](https://github.com/varvet/pundit).
-Elle nous permet d'extraire nos gestions de permissions dans des "policies". 
+Elle nous permet d'extraire la gestion de nos permissions dans des "policies". 
 Je ne vais pas m'attarder sur pundit, ça fera l'objet d'un futur article.
 
-**4: Vos permissions devraient être dans des classes responsables exclusivement de cela.**
+**4: Vos permissions doivent être dans des classes exclusivement responsables de cela.**
 
 En bref :
 
@@ -506,13 +506,13 @@ end
 ```ruby
 class PostsController < ApplicationController
   def update
-    # trouver le post
+    # Trouver le post
     @post = Post.find(params[:id])
 
-    # verifier que le current user à le droit de update
+    # Vérifier que le current user a le droit d'update
     authorize @post
 
-    # Si la moindre exception arrive là dedans, ça revient en arrière.
+    # Si la moindre exception arrive dans le bloc de la transaction, on revient en arrière.
     @post.transaction do
       @post.update!(update_params)
 
@@ -539,7 +539,7 @@ En effet, il n'appartient pas à mon modèle d'être responsable d'interactions 
 
 Arrive ici la notion de "couche métier" qui se placera entre vos modèles et vos controllers pour empaqueter les règles propres à votre business.
 Vos modèles auront comme unique responsabilité de savoir comment s'interfacer avec la database.
-Votre controller sera responsable de décrypter/vérifier les params, vérifier les permissions simples et lancer les actions.
+Votre controller sera responsable de déchiffrer/vérifier les params, vérifier les permissions simples et lancer les actions.
 Votre couche intermédiaire fera le reste.
 
 Pour ce faire, j'aime beaucoup utiliser la gem [interactor](https://github.com/collectiveidea/interactor), qui n'est à mon sens qu'un wrapper pratique autour du design pattern [Command](<https://fr.wikipedia.org/wiki/Commande_(patron_de_conception)>).
@@ -560,10 +560,10 @@ end
 
 Une classe avec une seule méthode publique: `call`.
 Il peut y avoir plusieurs sous fonctions `private` quand l'action en a besoin.
-Il vaut mieux néanmoins garder des actions les plus unitaires possibles (ça va permettre de les réutiliser plus tard ailleurs dans notre code un peu comme des Lego).
+Il vaut mieux néanmoins garder des actions les plus unitaires possibles (ça va permettre de les réutiliser plus tard ailleurs dans notre code, un peu comme des Lego).
 
 On appelle l'action de la manière suivante, n'importe où dans notre code : `NomDeLActionExplicite.call({context})`.
-Le context est un "hash" qui passe à l'action quand on l'appelle, et qui sera retourné par l'action.
+Le context est un "hash" qui est passé à l'action quand on l'appelle, et qui sera retourné par l'action.
 
 Par exemple:
 
@@ -617,13 +617,13 @@ Pour ensuite changer notre controller en :
 ```ruby
 class PostsController < ApplicationController
   def update
-    # trouver le post
+    # Trouver le post
     @post = Post.find(params[:id])
 
-    # verifier que le current user à le droit de update
+    # Vérifier que le current user a le droit d'update
     authorize @post
-
-    # Si la moindre exception arrive là dedans, revient en arrière.
+    
+    # Si la moindre exception arrive dans le bloc de la transaction, on revient en arrière.
     @post.transaction do
       @post.update!(update_params)
 
@@ -636,10 +636,9 @@ end
 
 ## Un problème de besoin et de sortie
 
-Un des gros défauts des interactors est qu'il n'est pas très facile de savoir ce que chacun s'attend à recevoir dans son context ni ce qu'il va y ajouter.
+Un des gros défauts des interactors est qu'il n'est pas très facile de savoir ce que chacun s'attend à recevoir dans son context, ni ce qu'il va y ajouter.
 
-Pour résoudre ce problème, on peut utiliser un "contrat" dans chacun de nos interactors.
-On peut le faire en définissant dans chacun un `before` et un `after` [hook](https://github.com/collectiveidea/interactor#hooks) qui vérifierait ce contrat.
+Pour résoudre ce problème, on peut utiliser un "contrat" dans chacun de nos interactors en définissant un `before` et un `after` [hook](https://github.com/collectiveidea/interactor#hooks) qui vérifie ce contrat.
 
 On peut aussi utiliser [interactor-contracts](https://github.com/michaelherold/interactor-contracts) qui est une gem qui simplifie leurs définitions.
 
@@ -708,13 +707,13 @@ Néanmoins, il est possible de laisser cette exception arriver en faisant : `.ca
 ```ruby
 class PostsController < ApplicationController
   def update
-    # trouver le post
+    # Trouver le post
     @post = Post.find(params[:id])
 
-    # verifier que le current user à le droit de update
+    # Vérifier que le current user a le droit d'update
     authorize @post
 
-    # Si la moindre exception arrive là dedans, revient en arrière.
+    # Si la moindre exception arrive dans la transaction, on revient en arrière.
     @post.transaction do
       @post.update!(update_params)
 
@@ -725,7 +724,7 @@ class PostsController < ApplicationController
 end
 ```
 
-En cas de rupture du contrat, une exception va donc arriver. On va faire en sorte de gérer cette exception.
+En cas de rupture du contrat, une exception va donc être levée, et il faudra la gérer.
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -803,7 +802,7 @@ end
 
 ## Les chaînes (organizers)
 
-On se retrouve quand même à transférer un contexte d'un interactor à un autre. Ce n'est pas très pratique.
+On se retrouve quand même à transférer un contexte d'un interactor à un autre, ce qui n'est pas très pratique.
 
 Pour simplifier la gestion de ces cas-là, on va utiliser les [organizers](https://github.com/collectiveidea/interactor#organizers).
 Les organizers consistent en une succession d'interactors qui transfèrent automatiquement le contexte d'un interactor de la chaine au suivant.
@@ -878,7 +877,7 @@ class PostsController < ApplicationController
     # Trouver le post
     @post = Post.find(params[:id])
 
-    # Verifier que le current user a le droit de update
+    # Vérifier que le current user a le droit d'update
     authorize @post
 
     # Action !
@@ -907,5 +906,5 @@ Les 8 commandements :
 - **8: Si c'est pas/difficilement testable, ça sent pas bon.**
 
 On a vu ce a quoi pouvaient servir les interactors et les différentes techniques pour réduire la taille et DRY ses méthodes de controller.
-Toutes ces techniques ne sont pas obligatoires mais ça devrait vous aider quand ça devient trop long ou trop complexe.
+Toutes ces techniques ne sont pas obligatoires mais ça devrait vous aider quand ça devient trop long et/ou trop complexe.
 
