@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: zaratan.fr 
+Token: 571581d5d95a5a67d2a239c53a46a39f337abc9bbe15bd676ceee29ab18fb8ce
