@@ -4,5 +4,5 @@
   "builds": [
     { "src": "./package.json", "use": "@now/static-build" }
   ],
-  "alias": ["www.zaratan.fr", "zaratan.fr", "next.zaratan.fr"]
+  "alias": ["www.zaratan.fr", "zaratan.fr"]
 }
